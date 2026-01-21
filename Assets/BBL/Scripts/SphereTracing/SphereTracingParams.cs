@@ -15,8 +15,6 @@ namespace BBL
         {
             block.SetInt(cache.Get("_RayMaxSteps"), maxSteps);
             block.SetFloat(cache.Get("_RayMaxDistance"), maxDistance);
-            block.SetVector(cache.Get("_RayOrigin"), camera.transform.position);
-            block.SetVector(cache.Get("_RayDirection"), camera.transform.forward);
         }
     }
 }
