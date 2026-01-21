@@ -78,5 +78,6 @@ MonoBehaviour:
     <SphereTracingParams>k__BackingField:
       maxSteps: 100
       maxDistance: 1000
-    <SphereTracingMaterial>k__BackingField: {fileID: 0}
+    <SphereTracingMaterial>k__BackingField: {fileID: 2100000, guid: e3adc815635abb743bb10968d05849bb,
+      type: 2}
     <PassIndex>k__BackingField: 0
