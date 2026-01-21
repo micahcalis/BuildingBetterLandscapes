@@ -6,7 +6,7 @@ namespace BBL
     [Serializable]
     public class SphereTracingParams
     {
-        [SerializeField, Range(0, 200)] private int maxSteps;
+        [SerializeField, Range(0, 400)] private int maxSteps;
         [SerializeField] private float maxDistance;
 
         private MaterialPropertyCache cache = new();

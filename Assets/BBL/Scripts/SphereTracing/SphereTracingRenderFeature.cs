@@ -10,22 +10,22 @@ namespace BBL
         
         [SerializeField] private SphereTracingRenderSettings sphereTracingSettings;
         
-        private SphereTracingPass sphereTracingPass;
+        private CrystalTracingPass crystalTracingPass;
         
         public override void Create()
         {
-            sphereTracingPass = new SphereTracingPass(sphereTracingSettings, name);
-            sphereTracingPass.renderPassEvent = SPHERE_TRACING_EVENT;
+            crystalTracingPass = new CrystalTracingPass(sphereTracingSettings, name);
+            crystalTracingPass.renderPassEvent = SPHERE_TRACING_EVENT;
         }
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            renderer.EnqueuePass(sphereTracingPass);
+            renderer.EnqueuePass(crystalTracingPass);
         }
 
         protected override void Dispose(bool disposing)
         {
-            sphereTracingPass.Dispose();
+            crystalTracingPass.Dispose();
         }
     }
 

@@ -1,7 +1,7 @@
 ﻿#ifndef SPHERE_TRACING_FUNCTIONS_INCLUDED
 #define SPHERE_TRACING_FUNCTIONS_INCLUDED
 
-#define DIST_EPS 1e-2
+#define DIST_EPS 1e-6
 
 struct Ray
 {
@@ -24,5 +24,10 @@ struct SphereTraceOutput
     int iterations;
     bool hit;
 };
+
+float PlaneSDF(float3 positionWS, float3 planeNormal, float offset)
+{
+    return dot(positionWS, planeNormal) + offset;
+}
 
 #endif
