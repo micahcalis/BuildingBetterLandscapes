@@ -73,7 +73,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa9fced21c0d48e98b3dd75076ad54d3, type: 3}
   m_Name: SphereTracingRenderFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   sphereTracingSettings:
     <SphereTracingParams>k__BackingField:
       maxSteps: 100

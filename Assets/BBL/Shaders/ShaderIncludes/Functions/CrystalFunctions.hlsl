@@ -37,18 +37,25 @@ float GetVoronoiDist(float2 uv, float cellDensity, float angleOffset, float nois
     return voronoi.id * noiseIntensity;
 }
 
+// float GetCrystalDist(CrystalInput crystalInput, float3 positionWS)
+// {
+//     float2 terrainUv = GetTerrainUV(positionWS, crystalInput.terrainCorner, crystalInput.terrainSize);
+//     if(terrainUv.x < 0 || terrainUv.x > 1 || terrainUv.y < 0 || terrainUv.y > 1) 
+//         return 10.0;
+//
+//     float heightSample = GetTerrainSample(crystalInput, terrainUv);
+//     float noiseOffset = GetVoronoiDist(terrainUv, crystalInput.cellDensity, crystalInput.angleOffset, crystalInput.noiseIntensity);
+//     float verticalDist = positionWS.y - (heightSample - 5.0 + noiseOffset); 
+//     return verticalDist * 0.5; 
+// }
+
 float GetCrystalDist(CrystalInput crystalInput, float3 positionWS)
 {
-    float2 terrainUv = GetTerrainUV(positionWS, crystalInput.terrainCorner, crystalInput.terrainSize);
-    
-    if(terrainUv.x < 0 || terrainUv.x > 1 || terrainUv.y < 0 || terrainUv.y > 1) 
-        return 10.0;
-
-    float heightSample = GetTerrainSample(crystalInput, terrainUv);
-    float noiseOffset = GetVoronoiDist(terrainUv, crystalInput.cellDensity, crystalInput.angleOffset, crystalInput.noiseIntensity);
-    float verticalDist = positionWS.y - (heightSample - 5.0 + noiseOffset); 
-    return verticalDist * 0.5; 
+    float box = BoxSDF(positionWS, float3(1, 0.1, 1));
+    float noiseOffset = GetVoronoiDist(positionWS.xz, crystalInput.cellDensity, crystalInput.angleOffset, crystalInput.noiseIntensity);
+    return box - noiseOffset * 0.5;
 }
+
 
 float3 GetNormal(CrystalInput crystalInput, float3 positionWS, float totalDist)
 {
