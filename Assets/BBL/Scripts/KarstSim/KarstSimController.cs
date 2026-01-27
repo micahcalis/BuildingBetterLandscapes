@@ -17,6 +17,14 @@ namespace BBL
         public void StartSimulation()
         {
             Debug.Log("Start Simulation");
+            Simulation = new KarstSimulation();
+            Simulation.Initialize(settings);
+        }
+
+        public void EndSimulation()
+        {
+            Debug.Log("End Simulation");
+            Dispose();
         }
 
         public void Dispose()

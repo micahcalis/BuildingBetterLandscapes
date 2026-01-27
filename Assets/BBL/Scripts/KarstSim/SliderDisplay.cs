@@ -1,4 +1,5 @@
 ﻿using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,11 +10,16 @@ namespace BBL
         public event Action<float> OnSliderChanged;
         
         [field: SerializeField] public Slider Slider { get; private set; }
-        [field: SerializeField] public Text Text { get; private set; }
+        [field: SerializeField] public TextMeshProUGUI Text { get; private set; }
 
-        public void Awake()
+        private void Awake()
         {
             Slider.onValueChanged.AddListener(CallOnSliderChanged);
+            CallOnSliderChanged(Slider.value);
+        }
+
+        public void Invoke()
+        {
             CallOnSliderChanged(Slider.value);
         }
 

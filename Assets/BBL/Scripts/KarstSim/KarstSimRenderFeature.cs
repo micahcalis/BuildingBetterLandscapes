@@ -63,6 +63,7 @@ namespace BBL
             if(karstEventHandler != null)
             {
                 karstEventHandler.OnSimStart += karstSimController.StartSimulation;
+                karstEventHandler.OnSimEnd += karstSimController.EndSimulation;
             }
         }
 
@@ -95,7 +96,7 @@ namespace BBL
     public class KarstSimSettings
     {
         [field: Header("Simulation Settings"), Space]
-        [field: SerializeField] public Vector3Int SimulationResolution { get; private set; }
+        public Vector3Int SimulationResolution { get; set; }
         
         [field: Header("References"), Space]
         [field: SerializeField] public GameObject UserIntPrefab { get; private set; } 

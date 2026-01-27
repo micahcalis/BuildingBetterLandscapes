@@ -6,6 +6,7 @@ namespace BBL
     public class KarstEventHandler : MonoBehaviour
     {
         public event Action OnSimStart;
+        public event Action OnSimEnd;
         
         private KarstSimSettings settings;
         private KarstSimInterface karstSimInterface;
@@ -26,8 +27,13 @@ namespace BBL
             {
                 OnSimStart?.Invoke();
             }
+
+            void EndSim()
+            {
+                OnSimEnd?.Invoke();
+            }
             
-            karstSimInterface = new KarstSimInterface(settings, StartSim);
+            karstSimInterface = new KarstSimInterface(settings, StartSim, EndSim);
         }
     }
 }

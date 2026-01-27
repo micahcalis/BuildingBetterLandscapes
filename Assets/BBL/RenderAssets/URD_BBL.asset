@@ -18,7 +18,8 @@ MonoBehaviour:
     hdrDebugViewPS: {fileID: 4800000, guid: 573620ae32aec764abd4d728906d2587, type: 3}
   m_RendererFeatures:
   - {fileID: 7298065642834042704}
-  m_RendererFeatureMap: 501f9b0c09f04765
+  - {fileID: 5923380216035569735}
+  m_RendererFeatureMap: 501f9b0c09f047654770604eec123452
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -61,6 +62,24 @@ MonoBehaviour:
   m_CopyDepthMode: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+--- !u!114 &5923380216035569735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 038938ddecd34488bc2433afbee6c354, type: 3}
+  m_Name: KarstSimRenderFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  <KarstSimSettings>k__BackingField:
+    <SimulationResolution>k__BackingField: {x: 100, y: 100, z: 100}
+    <UserIntPrefab>k__BackingField: {fileID: 1083530521988673654, guid: 2d140d33cd7825448a21dac065c2feff,
+      type: 3}
+    <ParticleMaterial>k__BackingField: {fileID: 0}
 --- !u!114 &7298065642834042704
 MonoBehaviour:
   m_ObjectHideFlags: 0
