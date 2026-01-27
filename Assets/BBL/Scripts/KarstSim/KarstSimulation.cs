@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -8,6 +7,9 @@ namespace BBL
     public class KarstSimulation
     {
         public RTHandle SimulationVolume;
+        public bool Active { get; private set; } = false;
+        
+        private MaterialPropertyCache cache = new();
 
         public void Initialize(KarstSimSettings settings)
         {
@@ -20,7 +22,9 @@ namespace BBL
             descriptor.volumeDepth = settings.SimulationResolution.z;
             
             RenderingUtils.ReAllocateIfNeeded(ref SimulationVolume, descriptor);
-            Debug.Log("SimulationRes: " + SimulationVolume.rt.width + ", " + SimulationVolume.rt.height);
+            Debug.Log("SimulationRes: " + SimulationVolume.rt.width + ", " + SimulationVolume.rt.height + ", " + SimulationVolume.rt.volumeDepth);
+
+            Fill(settings);
         }
 
         public void Update()
@@ -31,6 +35,21 @@ namespace BBL
         public void Dispose()
         {
             SimulationVolume?.Release();
+        }
+
+        public void SetActive(bool active)
+        {
+            Active = active;
+        }
+
+        private void Fill(KarstSimSettings settings)
+        {
+            ComputeShader compute = settings.KarstSimCompute;
+            int kernel = KarstSimSettings.FILL_KERNEL;
+            
+            Vector3Int groups = KarstSimUtilities.GetThreadGroupsFull(SimulationVolume.rt, KarstSimSettings.THREADGROUP_SIZE);
+            compute.SetTexture(kernel, cache.Get("_FillTarget"), SimulationVolume);
+            compute.Dispatch(kernel, groups.x, groups.y, groups.z);
         }
     }
 }

@@ -1,0 +1,12 @@
+#pragma kernel ExtractParticles
+
+#include "Assets/BBL/Shaders/ShaderIncludes/Karst/KarstParticles.hlsl"
+
+AppendStructuredBuffer<KarstParticle> _KarstParticlesAppendBuffer;
+Texture3D<float4> _KarstVolume;
+
+[numthreads(8,8,8)]
+void ExtractParticles (uint3 id : SV_DispatchThreadID)
+{
+    TryAppendParticle(id, _KarstVolume, _KarstParticlesAppendBuffer);
+}

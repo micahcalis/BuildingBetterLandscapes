@@ -7,7 +7,6 @@ namespace BBL
         public static KarstSimulation Simulation { get; private set; }
         
         private KarstSimSettings settings;
-        private bool initialized = false;
 
         public KarstSimController(KarstSimSettings settings)
         {
@@ -19,12 +18,14 @@ namespace BBL
             Debug.Log("Start Simulation");
             Simulation = new KarstSimulation();
             Simulation.Initialize(settings);
+            Simulation.SetActive(true);
         }
 
         public void EndSimulation()
         {
             Debug.Log("End Simulation");
             Dispose();
+            Simulation.SetActive(false);
         }
 
         public void Dispose()

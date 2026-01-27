@@ -1,0 +1,12 @@
+#pragma kernel FillVolume
+
+RWTexture3D<float4> _FillTarget;
+
+[numthreads(8,8,8)]
+void FillVolume (uint3 id : SV_DispatchThreadID)
+{
+    uint checkerSize = 1; 
+    uint3 pos = id / checkerSize;
+    bool isRed = (pos.x + pos.y + pos.z) % 2 == 0;
+    _FillTarget[id] = isRed ? float4(1, 0, 0, 1) : float4(0, 0, 1, 1);
+}
