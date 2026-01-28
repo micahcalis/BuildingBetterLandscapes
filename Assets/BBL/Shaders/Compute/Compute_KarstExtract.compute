@@ -8,5 +8,11 @@ Texture3D<float4> _KarstVolume;
 [numthreads(8,8,8)]
 void ExtractParticles (uint3 id : SV_DispatchThreadID)
 {
-    TryAppendParticle(id, _KarstVolume, _KarstParticlesAppendBuffer);
+    if (ThreadOutOfBounds(id)) 
+        return;
+
+    if (AppendParticles())
+        TryAppendParticle(id, _KarstVolume, _KarstParticlesAppendBuffer);
+    else
+        TryAppendHologram(id, _KarstVolume, _KarstParticlesAppendBuffer);
 }

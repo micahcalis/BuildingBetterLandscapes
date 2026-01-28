@@ -23,6 +23,7 @@ namespace BBL
         [field: SerializeField] public Mesh ParticleMesh { get; private set; }
         
         public Vector3Int SimulationResolution { get; set; }
+        public KarstViewMode ViewMode { get; set; } = KarstViewMode.Particles;
         public float FloorAmount { get; set; }
         public float StoneAmount { get; set; }
         public float ClayAmount { get; set; }
@@ -34,5 +35,11 @@ namespace BBL
         public float FractureAngle { get; set; }
         public float FractureNoiseScale { get; set; }
         public int FractureNoiseSeed { get; set; }
+    }
+
+    public enum KarstViewMode
+    {
+        Particles,
+        Hologram
     }
 }

@@ -7,8 +7,8 @@
 #define LAYER_N_F_MUL 1.15f
 #define LAYER_N_A_MUL 0.95f
 
-#define FRAC_N_L_STRENGTH 0.088f
-#define FRAC_N_H_STRENGTH 0.02f
+#define FRAC_N_L_STRENGTH 0.15f
+#define FRAC_N_H_STRENGTH 0.05f
 #define FRAC_F_MUL 0.33f
 #define FRAC_EDGE 0.9
 #define FRAC_CONTRAST 6.0f

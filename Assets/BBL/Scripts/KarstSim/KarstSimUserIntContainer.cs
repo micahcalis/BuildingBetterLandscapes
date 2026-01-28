@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,9 +7,14 @@ namespace BBL
 {
     public class KarstSimUserIntContainer : MonoBehaviour
     {
+        public static readonly string VIEW_PARTICLE_TEXT = "Voxel View";
+        public static readonly string VIEW_HOLOGRAM_TEXT = "Holo View";
+        
         [field: Header("References"), Space]
         [field: SerializeField] public Button StartSimulationButton { get; private set; }
         [field: SerializeField] public Button EndSimulationButton { get; private set; }
+        [field: SerializeField] public Button ViewModeButton { get; private set; }
+        [field: SerializeField] public TextMeshProUGUI ViewModeText { get; private set; }
         [field: SerializeField] public SliderDisplay ResolutionX { get; private set; }
         [field: SerializeField] public SliderDisplay ResolutionY { get; private set; }
         [field: SerializeField] public SliderDisplay ResolutionZ { get; private set; }

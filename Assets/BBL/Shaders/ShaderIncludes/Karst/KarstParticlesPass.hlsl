@@ -54,4 +54,9 @@ float4 KarstParticleFrag(ParticleVertData input) : SV_TARGET
     return float4(color * NdotL, 1);
 }
 
+float4 KarstHologramFrag(ParticleVertData input) : SV_TARGET
+{
+    return _EmptyColor;
+}
+
 #endif

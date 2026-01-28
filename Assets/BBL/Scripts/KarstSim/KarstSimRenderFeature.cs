@@ -5,7 +5,7 @@ namespace BBL
 {
     public class KarstSimRenderFeature : ScriptableRendererFeature
     {
-        private const RenderPassEvent RENDER_EVENT = RenderPassEvent.AfterRenderingOpaques;
+        private const RenderPassEvent RENDER_EVENT = RenderPassEvent.AfterRenderingTransparents;
         
         [field: SerializeField] public KarstSimSettings KarstSimSettings { get; private set; }
         

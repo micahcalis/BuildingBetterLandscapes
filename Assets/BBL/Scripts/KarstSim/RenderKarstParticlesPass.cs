@@ -7,6 +7,9 @@ namespace BBL
 {
     public class RenderKarstParticlesPass : ScriptableRenderPass
     {
+        private const int PARTICLE_PASS = 0;
+        private const int HOLOGRAM_PASS = 1;
+        
         private KarstSimSettings settings;
         private KarstSimulation simulation => KarstSimController.Simulation;
         private ProfilingSampler profilingSampler;
@@ -40,14 +43,14 @@ namespace BBL
                 context.ExecuteCommandBuffer(cmd);
                 cmd.Clear();
                 
-                ExtractParticles(cmd);
+                ExtractParticles(cmd, out bool appendMode);
                 CopyAppendCount(cmd);
                 FillMaterialBlock();
                 
                 cmd.DrawMeshInstancedIndirect(settings.ParticleMesh,
                     submeshIndex: 0,
                     settings.ParticleMaterial,
-                    shaderPass: 0,
+                    shaderPass: appendMode ? PARTICLE_PASS : HOLOGRAM_PASS,
                     drawBuffer,
                     argsOffset: 0,
                     properties: propertyBlock);
@@ -57,7 +60,7 @@ namespace BBL
             CommandBufferPool.Release(cmd);
         }
 
-        private void ExtractParticles(CommandBuffer cmd)
+        private void ExtractParticles(CommandBuffer cmd, out bool appendMode)
         {
             ComputeShader compute = settings.KarstExtractCompute;
             int kernel = KarstSimSettings.EXTRACT_KERNEL;
@@ -76,6 +79,8 @@ namespace BBL
             cmd.SetComputeTextureParam(compute, kernel, cache.Get("_KarstVolume"), simulation.SimulationVolume);
             cmd.SetComputeMatrixParam(compute, cache.Get("_ParticleToWorld"), GetKarstParticleToWorldMatrix());
             cmd.SetComputeVectorParam(compute, cache.Get("_SimulationDimensions"), (Vector3)settings.SimulationResolution);
+            appendMode = settings.ViewMode == KarstViewMode.Particles;
+            cmd.SetComputeIntParam(compute, cache.Get("_AppendMode"), appendMode ? 0 : 1);
             
             cmd.DispatchCompute(compute, kernel, groups.x, groups.y, groups.z);
         }

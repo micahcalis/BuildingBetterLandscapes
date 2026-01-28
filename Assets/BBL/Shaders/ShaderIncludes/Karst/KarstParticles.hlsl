@@ -15,6 +15,7 @@ struct KarstParticle
 
 float4x4 _ParticleToWorld;
 StructuredBuffer<KarstParticle> _ParticleBuffer;
+int _AppendMode;
 
 float3 GetWorldSpacePosition(KarstParticle particle, float3 vertexPos)
 {
@@ -28,16 +29,34 @@ float3 GetLocalPosition(int3 id)
     return (float3)id - halfDim;
 }
 
+bool AppendParticles()
+{
+    return _AppendMode == 0;
+}
+
 void TryAppendParticle(int3 id,
     Texture3D<float4> kartsVolume,
     AppendStructuredBuffer<KarstParticle> particleBuffer)
 {
-    if (ThreadOutOfBounds(id)) 
-        return;
-    
     float4 sample = kartsVolume[id];
     
     if (sample.g <= DENSITY_EPS)
+        return;
+
+    KarstParticle particle;
+    particle.localPos = GetLocalPosition(id);
+    particle.materialIndex = GetMaterialIndex(sample.r);
+    particle.density = sample.g;
+    particleBuffer.Append(particle);
+}
+
+void TryAppendHologram(int3 id,
+    Texture3D<float4> kartsVolume,
+    AppendStructuredBuffer<KarstParticle> particleBuffer)
+{
+    float4 sample = kartsVolume[id];
+
+    if (sample.g > DENSITY_EPS)
         return;
 
     KarstParticle particle;

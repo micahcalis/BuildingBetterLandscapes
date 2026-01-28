@@ -28,6 +28,7 @@ namespace BBL
         {
             container.StartSimulationButton.onClick.AddListener(() => OnSimStart(onSimStart));
             container.EndSimulationButton.onClick.AddListener(() => OnSimEnd(onSimEnd));
+            container.ViewModeButton.onClick.AddListener(ToggleViewMode);
             container.ResolutionX.OnSliderChanged += SetResolutionX;
             container.ResolutionY.OnSliderChanged += SetResolutionY;
             container.ResolutionZ.OnSliderChanged += SetResolutionZ;
@@ -48,6 +49,7 @@ namespace BBL
         {
             container.StartSimulationButton.gameObject.SetActive(false);
             container.EndSimulationButton.gameObject.SetActive(true);
+            container.ViewModeButton.gameObject.SetActive(true);
             SetSlidersActive(false);
             onSimStart?.Invoke();
         }
@@ -56,8 +58,23 @@ namespace BBL
         {
             container.StartSimulationButton.gameObject.SetActive(true);
             container.EndSimulationButton.gameObject.SetActive(false);
+            container.ViewModeButton.gameObject.SetActive(false);
             SetSlidersActive(true);
             onSimEnd?.Invoke();
+        }
+
+        private void ToggleViewMode()
+        {
+            if (settings.ViewMode == KarstViewMode.Particles)
+            {
+                settings.ViewMode = KarstViewMode.Hologram;
+                container.ViewModeText.text = KarstSimUserIntContainer.VIEW_HOLOGRAM_TEXT;
+            }
+            else if (settings.ViewMode == KarstViewMode.Hologram)
+            {
+                settings.ViewMode = KarstViewMode.Particles;
+                container.ViewModeText.text = KarstSimUserIntContainer.VIEW_PARTICLE_TEXT;
+            }
         }
         
         private void SetResolutionX(float value)
