@@ -54,4 +54,24 @@ KarstMaterial GetMaterial(int3 id)
     return material;
 }
 
+float GetFractureDensity(uint3 id)
+{
+    float3 uvw = GetUvw(id);
+    float2 uv = uvw.xz;
+    float height = uvw.y;
+    
+    Fracture fracture = GetFractureNoise(uv);
+    float baseHeight = _FloorAmount + _StoneAmount;
+    float fractureHeight = baseHeight - fracture.height * _StoneAmount;
+    float voxelHeight = rcp(_SimulationDimensions.y);
+    
+    float fractureHeightMin = fractureHeight - voxelHeight;
+    float fractureHeightMax = fractureHeight + voxelHeight;
+    float minHeightMask = step(fractureHeightMin, height);
+    float maxHeightMask = step(height, fractureHeightMax);
+    float heightMask = minHeightMask * maxHeightMask;
+
+    return 1 - (1 - fracture.density) * heightMask;
+}
+
 #endif

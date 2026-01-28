@@ -3,13 +3,30 @@
 
 #include "Assets/BBL/Shaders/ShaderIncludes/Library/FBM.hlsl"
 
-#define LAYER_N_STRENGTH 0.1f
-#define LAYER_N_F_MUL 1.2f
-#define LAYER_N_A_MUL 0.8f
+#define LAYER_N_STRENGTH 0.15f
+#define LAYER_N_F_MUL 1.15f
+#define LAYER_N_A_MUL 0.95f
+
+#define FRAC_N_L_STRENGTH 0.088f
+#define FRAC_N_H_STRENGTH 0.02f
+#define FRAC_F_MUL 0.33f
+#define FRAC_EDGE 0.3
+#define FRAC_CONTRAST 6.0f
+
+struct Fracture
+{
+    float density;
+    float height;
+};
 
 float _KarstLayerNoiseScale;
 int _KarstLayerNoiseSeed;
 int _KarstLayerNoiseOctaves;
+
+float _KarstFractureNoiseScale;
+float _KarstFractureNoiseAngle;
+int _KarstFractureNoiseSeed;
+float _KarstFractureZoom;
 
 // from unity shader graph: https://docs.unity3d.com/Packages/com.unity.shadergraph@6.9/manual/Gradient-Noise-Node.html
 float2 RandomVector2D(float2 pos)
@@ -82,6 +99,53 @@ float GetLayerNoise(float2 uv, int materialIndex)
 
     float noise = FbmPerlin2D(coord, fbm);
     return noise * LAYER_N_STRENGTH;
+}
+
+float2 RotateCenter2D(float2 uv, float2 center, float angle)
+{
+    uv -= center;
+    float s = sin(angle);
+    float c = cos(angle);
+    float2x2 rMatrix = float2x2(c, -s, s, c);
+    rMatrix *= 0.5;
+    rMatrix += 0.5;
+    rMatrix = rMatrix * 2 - 1;
+    uv.xy = mul(uv.xy, rMatrix);
+    uv += center;
+    return uv;
+}
+
+float2 GetOffsetCoord(float2 uv, out float offsetNoiseHigh)
+{
+    float noiseLowScale = _KarstFractureNoiseScale;
+    float noiseHighScale = noiseLowScale * FRAC_F_MUL;
+    float2 seedCoord = uv + HashToFloat(Hash11(_KarstFractureNoiseSeed)) * 100;
+
+    float offsetNoiseLow = Perlin2D(seedCoord * noiseLowScale) * FRAC_N_L_STRENGTH;
+    offsetNoiseHigh = Perlin2D(seedCoord * noiseHighScale) * FRAC_N_H_STRENGTH;
+    float2 noiseCoord = seedCoord + offsetNoiseLow + offsetNoiseHigh;
+    float2 rotateCoord = RotateCenter2D(noiseCoord, 0, _KarstFractureNoiseAngle);
+
+    return rotateCoord;
+}
+
+Fracture GetFractureNoise(float2 uv)
+{
+    float heightNoise;
+    float2 offsetCoord = GetOffsetCoord(uv, heightNoise);
+    float2 fractureCoord = offsetCoord * _KarstFractureZoom;
+    float2 horizontalCoord = fractureCoord.xx;
+    float2 verticalCoord = fractureCoord.yy;
+    
+    float horizontalFracture = Perlin2D(horizontalCoord);
+    float verticalFracture = Perlin2D(verticalCoord);
+    float densityRaw = min(horizontalFracture, verticalFracture);
+    float density = pow(smoothstep(0, FRAC_F_MUL, densityRaw), FRAC_CONTRAST);
+
+    Fracture fracture;
+    fracture.density = density;
+    fracture.height = heightNoise;
+    return fracture;
 }
 
 #endif

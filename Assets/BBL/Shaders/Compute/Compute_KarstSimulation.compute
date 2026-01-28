@@ -1,4 +1,5 @@
 #pragma kernel FillVolume
+#pragma kernel FractureVolume
 
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/KarstCore.hlsl"
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/KarstVolumeInitialization.hlsl"
@@ -6,7 +7,7 @@
 RWTexture3D<float4> _FillTarget;
 
 [numthreads(8,8,8)]
-void FillVolume (uint3 id : SV_DispatchThreadID)
+void FillVolume (uint3 id : SV_DispatchThreadID) // 0
 {
     if (ThreadOutOfBounds(id)) 
         return;
@@ -21,4 +22,26 @@ void FillVolume (uint3 id : SV_DispatchThreadID)
     {
         _FillTarget[id] = float4(0, 0, 0, 0);
     }
+}
+
+RWTexture3D<float4> _FractureTarget;
+
+[numthreads(8,8,8)]
+void FractureVolume (uint3 id : SV_DispatchThreadID) // 1
+{
+    if (ThreadOutOfBounds(id)) 
+        return;
+
+    float4 targetSample = _FractureTarget[id];
+    float currentDensity = targetSample.g;
+
+    if (currentDensity < 1e-4)
+        return;
+    
+    float fractureDensity = GetFractureDensity(id);
+    float newDensity = targetSample.g * fractureDensity;
+    _FractureTarget[id] = float4(targetSample.r,
+        newDensity,
+        targetSample.b,
+        targetSample.a);
 }
