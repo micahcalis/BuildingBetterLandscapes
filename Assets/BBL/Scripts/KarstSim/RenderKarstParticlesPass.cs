@@ -138,7 +138,7 @@ namespace BBL
     public struct KarstParticle
     {
         public Vector3 LocalPos;
-        public Vector3 Color;
-        public float Opacity;
+        public int MaterialIndex;
+        public float Density;
     }
 }

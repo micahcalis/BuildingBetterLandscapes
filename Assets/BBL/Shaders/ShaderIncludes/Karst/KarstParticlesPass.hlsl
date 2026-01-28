@@ -25,10 +25,28 @@ ParticleVertData KarstParticleVert(ParticleMeshData input, uint instanceId : SV_
     return output;
 }
 
+float3 GetMaterialColor(int materialIndex)
+{
+    switch (materialIndex)
+    {
+        case FLOOR:
+            return _FloorColor;
+        case STONE:
+            return _StoneColor;
+        case CLAY:
+            return _ClayColor;
+        case SAND:
+            return _SandColor;
+        default:
+            return 0;
+    }
+}
+
 float4 KarstParticleFrag(ParticleVertData input) : SV_TARGET
 {
     KarstParticle particle = _ParticleBuffer[input.instanceId];
-    return float4(particle.color, 1);
+    float3 color = GetMaterialColor(particle.materialIndex);
+    return float4(color, 1);
 }
 
 #endif

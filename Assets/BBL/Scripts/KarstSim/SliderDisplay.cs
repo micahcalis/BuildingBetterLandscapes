@@ -11,6 +11,7 @@ namespace BBL
         
         [field: SerializeField] public Slider Slider { get; private set; }
         [field: SerializeField] public TextMeshProUGUI Text { get; private set; }
+        [field: SerializeField] public int DecimalCount { get; private set; } = 0;
 
         private void Awake()
         {
@@ -25,7 +26,7 @@ namespace BBL
 
         private void CallOnSliderChanged(float val)
         {
-            Text.text = val.ToString();
+            Text.text = val.ToString("F" + DecimalCount);
             OnSliderChanged?.Invoke(val);
         }
     }

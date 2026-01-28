@@ -1,17 +1,19 @@
 ﻿#ifndef KARST_PARTICLES_INCLUDED
 #define KARST_PARTICLES_INCLUDED
 
-#define ALPHA_EPS 1e-4
+#include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/KarstCore.hlsl"
+
+#define DENSITY_EPS 1e-4
+#define NUM_MATS 3
 
 struct KarstParticle
 {
     float3 localPos;
-    float3 color;
-    float opacity;
+    int materialIndex;
+    float density;
 };
 
 float4x4 _ParticleToWorld;
-float3 _SimulationDimensions;
 StructuredBuffer<KarstParticle> _ParticleBuffer;
 
 float3 GetWorldSpacePosition(KarstParticle particle, float3 vertexPos)
@@ -30,18 +32,18 @@ void TryAppendParticle(int3 id,
     Texture3D<float4> kartsVolume,
     AppendStructuredBuffer<KarstParticle> particleBuffer)
 {
-    if (any(id >= (int3)_SimulationDimensions)) 
+    if (ThreadOutOfBounds(id)) 
         return;
     
     float4 sample = kartsVolume[id];
     
-    if (sample.a <= ALPHA_EPS)
+    if (sample.g <= DENSITY_EPS)
         return;
 
     KarstParticle particle;
     particle.localPos = GetLocalPosition(id);
-    particle.color = sample.rgb;
-    particle.opacity = sample.a;
+    particle.materialIndex = GetMaterialIndex(sample.r);
+    particle.density = sample.g;
     particleBuffer.Append(particle);
 }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 namespace BBL
@@ -90,26 +89,5 @@ namespace BBL
             GameObject handlerObject = new GameObject(typeof(KarstEventHandler).ToString());
             return handlerObject.AddComponent<KarstEventHandler>();
         }
-    }
-
-    [Serializable]
-    public class KarstSimSettings
-    {
-        public static readonly int FILL_KERNEL = 0;
-        public static readonly int EXTRACT_KERNEL = 0;
-        public static int THREADGROUP_SIZE = 8;
-        
-        [field: Header("Simulation Settings"), Space]
-        [field: SerializeField] public Vector3 SimulationCenter { get; private set; }
-        [field: SerializeField] public float ParticleSize { get; private set; } = 1;
-        
-        [field: Header("References"), Space]
-        [field: SerializeField] public GameObject UserIntPrefab { get; private set; }
-        [field: SerializeField] public ComputeShader KarstSimCompute { get; private set; }
-        [field: SerializeField] public ComputeShader KarstExtractCompute { get; private set; }
-        [field: SerializeField] public Material ParticleMaterial { get; private set; }
-        [field: SerializeField] public Mesh ParticleMesh { get; private set; }
-        
-        public Vector3Int SimulationResolution { get; set; }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace BBL
@@ -29,25 +31,28 @@ namespace BBL
             container.ResolutionX.OnSliderChanged += SetResolutionX;
             container.ResolutionY.OnSliderChanged += SetResolutionY;
             container.ResolutionZ.OnSliderChanged += SetResolutionZ;
+            container.FloorPercentage.OnSliderChanged += SetFloorAmount;
+            container.StonePercentage.OnSliderChanged += SetStoneAmount;
+            container.ClayPercentage.OnSliderChanged += SetClayAmount;
+            container.SandPercentage.OnSliderChanged += SetSandAmount;
+            container.LayerNoiseScale.OnSliderChanged += SetLayerNoiseScale;
+            container.LayerNoiseSeed.OnSliderChanged += SetLayerNoiseSeed;
+            container.LayerNoiseOctaves.OnSliderChanged += SetLayerNoiseOctaves;
         }
 
         private void OnSimStart(Action onSimStart)
         {
             container.StartSimulationButton.gameObject.SetActive(false);
-            container.ResolutionX.gameObject.SetActive(false);
-            container.ResolutionY.gameObject.SetActive(false);
-            container.ResolutionZ.gameObject.SetActive(false);
             container.EndSimulationButton.gameObject.SetActive(true);
+            SetSlidersActive(false);
             onSimStart?.Invoke();
         }
 
         private void OnSimEnd(Action onSimEnd)
         {
             container.StartSimulationButton.gameObject.SetActive(true);
-            container.ResolutionX.gameObject.SetActive(true);
-            container.ResolutionY.gameObject.SetActive(true);
-            container.ResolutionZ.gameObject.SetActive(true);
             container.EndSimulationButton.gameObject.SetActive(false);
+            SetSlidersActive(true);
             onSimEnd?.Invoke();
         }
         
@@ -71,11 +76,56 @@ namespace BBL
                 (int)value);
         }
 
+        private void SetFloorAmount(float value)
+        {
+            settings.FloorAmount = value / 100f;
+        }
+
+        private void SetStoneAmount(float value)
+        {
+            settings.StoneAmount = value / 100f;
+        }
+        private void SetClayAmount(float value)
+        {
+            settings.ClayAmount = value / 100f;
+        }
+        
+        private void SetSandAmount(float value)
+        {
+            settings.SandAmount = value / 100f;
+        }
+
+        private void SetLayerNoiseScale(float value)
+        {
+            settings.LayerNoiseScale = value;
+        }
+
+        private void SetLayerNoiseSeed(float value)
+        {
+            settings.LayerNoiseSeed = (int)value;
+        }
+
+        private void SetLayerNoiseOctaves(float value)
+        {
+            settings.LayerNoiseOctaves = (int)value;
+        }
+
         private void ForceApplySettings()
         {
-            container.ResolutionX.Invoke();
-            container.ResolutionY.Invoke();
-            container.ResolutionZ.Invoke();
+            List<SliderDisplay> sliders = container.GetSliders();
+            foreach (SliderDisplay slider in sliders)
+            {
+                slider.Invoke();
+            }
+        }
+
+        private void SetSlidersActive(bool active)
+        {
+            List<SliderDisplay> sliders = container.GetSliders();
+            foreach (SliderDisplay slider in sliders)
+            {
+                slider.gameObject.SetActive(active);
+            }
         }
     }
 }
