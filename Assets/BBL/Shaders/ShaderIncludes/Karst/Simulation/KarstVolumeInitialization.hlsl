@@ -65,8 +65,8 @@ float GetFractureDensity(uint3 id)
     float fractureHeight = baseHeight - fracture.height * _StoneAmount;
     float voxelHeight = rcp(_SimulationDimensions.y);
     
-    float fractureHeightMin = fractureHeight - voxelHeight;
-    float fractureHeightMax = fractureHeight + voxelHeight;
+    float fractureHeightMin = fractureHeight - voxelHeight * 1.5;
+    float fractureHeightMax = fractureHeight + voxelHeight * 1.5;
     float minHeightMask = step(fractureHeightMin, height);
     float maxHeightMask = step(height, fractureHeightMax);
     float heightMask = minHeightMask * maxHeightMask;

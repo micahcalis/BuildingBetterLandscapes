@@ -38,6 +38,10 @@ namespace BBL
             container.LayerNoiseScale.OnSliderChanged += SetLayerNoiseScale;
             container.LayerNoiseSeed.OnSliderChanged += SetLayerNoiseSeed;
             container.LayerNoiseOctaves.OnSliderChanged += SetLayerNoiseOctaves;
+            container.FractureZoom.OnSliderChanged += SetFractureZoom;
+            container.FractureNoiseScale.OnSliderChanged += SetFractureNoiseScale;
+            container.FractureNoiseSeed.OnSliderChanged += SetFractureNoiseSeed;
+            container.FractureAngle.OnSliderChanged += SetFractureAngle;
         }
 
         private void OnSimStart(Action onSimStart)
@@ -97,7 +101,7 @@ namespace BBL
 
         private void SetLayerNoiseScale(float value)
         {
-            settings.LayerNoiseScale = value;
+            settings.LayerNoiseScale = 1.0f / value;
         }
 
         private void SetLayerNoiseSeed(float value)
@@ -108,6 +112,26 @@ namespace BBL
         private void SetLayerNoiseOctaves(float value)
         {
             settings.LayerNoiseOctaves = (int)value;
+        }
+
+        private void SetFractureZoom(float value)
+        {
+            settings.FractureZoom = 1.0f / value;
+        }
+
+        private void SetFractureAngle(float value)
+        {
+            settings.FractureAngle = Mathf.Deg2Rad * value;
+        }
+
+        private void SetFractureNoiseScale(float value)
+        {
+            settings.FractureNoiseScale = 1.0f / value;
+        }
+
+        private void SetFractureNoiseSeed(float value)
+        {
+            settings.FractureNoiseSeed = (int)value;
         }
 
         private void ForceApplySettings()

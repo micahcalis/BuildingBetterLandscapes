@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Net.Sockets;
+using UnityEngine;
 
 namespace BBL
 {
@@ -17,7 +18,7 @@ namespace BBL
         {
             Debug.Log("Start Simulation");
             Simulation = new KarstSimulation();
-            Simulation.Initialize(settings);
+            CreateSimulationVolume();
             Simulation.SetActive(true);
         }
 
@@ -31,6 +32,13 @@ namespace BBL
         public void Dispose()
         {
             Simulation?.Dispose();
+        }
+
+        private void CreateSimulationVolume()
+        {
+            Simulation.Initialize(settings);
+            Simulation.Fill(settings);
+            Simulation.Fracture(settings);
         }
     }
 }

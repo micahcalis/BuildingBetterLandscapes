@@ -7,6 +7,7 @@ namespace BBL
     public class KarstSimSettings
     {
         public static readonly int FILL_KERNEL = 0;
+        public static readonly int FRACTURE_KERNEL = 1;
         public static readonly int EXTRACT_KERNEL = 0;
         public static int THREADGROUP_SIZE = 8;
         
@@ -29,5 +30,9 @@ namespace BBL
         public float LayerNoiseScale { get; set; }
         public int LayerNoiseSeed { get; set; }
         public int LayerNoiseOctaves { get; set; }
+        public float FractureZoom { get; set; }
+        public float FractureAngle { get; set; }
+        public float FractureNoiseScale { get; set; }
+        public int FractureNoiseSeed { get; set; }
     }
 }

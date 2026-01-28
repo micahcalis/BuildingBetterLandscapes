@@ -10,7 +10,7 @@
 #define FRAC_N_L_STRENGTH 0.088f
 #define FRAC_N_H_STRENGTH 0.02f
 #define FRAC_F_MUL 0.33f
-#define FRAC_EDGE 0.3
+#define FRAC_EDGE 0.9
 #define FRAC_CONTRAST 6.0f
 
 struct Fracture
@@ -48,6 +48,11 @@ float Perlin2D(float2 pos)
     float d11 = dot(RandomVector2D(ip + float2(1, 1)), fp - float2(1, 1));
     fp = fp * fp * fp * (fp * (fp * 6 - 15) + 10);
     return lerp(lerp(d00, d01, fp.y), lerp(d10, d11, fp.y), fp.x);
+}
+
+float Perlin2D01(float2 pos)
+{
+    return Perlin2D(pos) * 0.5 + 0.5;
 }
 
 uint Hash11(uint n)
@@ -121,8 +126,8 @@ float2 GetOffsetCoord(float2 uv, out float offsetNoiseHigh)
     float noiseHighScale = noiseLowScale * FRAC_F_MUL;
     float2 seedCoord = uv + HashToFloat(Hash11(_KarstFractureNoiseSeed)) * 100;
 
-    float offsetNoiseLow = Perlin2D(seedCoord * noiseLowScale) * FRAC_N_L_STRENGTH;
-    offsetNoiseHigh = Perlin2D(seedCoord * noiseHighScale) * FRAC_N_H_STRENGTH;
+    float offsetNoiseLow = Perlin2D01(seedCoord * noiseLowScale) * FRAC_N_L_STRENGTH;
+    offsetNoiseHigh = Perlin2D01(seedCoord * noiseHighScale) * FRAC_N_H_STRENGTH;
     float2 noiseCoord = seedCoord + offsetNoiseLow + offsetNoiseHigh;
     float2 rotateCoord = RotateCenter2D(noiseCoord, 0, _KarstFractureNoiseAngle);
 
@@ -137,14 +142,14 @@ Fracture GetFractureNoise(float2 uv)
     float2 horizontalCoord = fractureCoord.xx;
     float2 verticalCoord = fractureCoord.yy;
     
-    float horizontalFracture = Perlin2D(horizontalCoord);
-    float verticalFracture = Perlin2D(verticalCoord);
+    float horizontalFracture = Perlin2D01(horizontalCoord);
+    float verticalFracture = Perlin2D01(verticalCoord);
     float densityRaw = min(horizontalFracture, verticalFracture);
-    float density = pow(smoothstep(0, FRAC_F_MUL, densityRaw), FRAC_CONTRAST);
+    float density = pow(smoothstep(0, FRAC_EDGE, densityRaw), FRAC_CONTRAST);
 
     Fracture fracture;
     fracture.density = density;
-    fracture.height = heightNoise;
+    fracture.height = ((heightNoise / FRAC_N_L_STRENGTH)) * 3;
     return fracture;
 }
 

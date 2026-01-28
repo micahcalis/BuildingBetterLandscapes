@@ -3,16 +3,19 @@
 
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/KarstParticles.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
 struct ParticleMeshData
 {
     float4 positionOS : POSITION;
+    float3 normalOS   : NORMAL;
 };
 
 struct ParticleVertData
 {
     float4 positionCS : SV_POSITION;
     int instanceId    : TEXCOORD0;
+    float3 normalWS   : TEXCOORD1;
 };
 
 ParticleVertData KarstParticleVert(ParticleMeshData input, uint instanceId : SV_InstanceID)
@@ -22,6 +25,7 @@ ParticleVertData KarstParticleVert(ParticleMeshData input, uint instanceId : SV_
     float3 positionWS = GetWorldSpacePosition(particle, input.positionOS);
     output.positionCS = TransformWorldToHClip(positionWS);
     output.instanceId = instanceId;
+    output.normalWS = input.normalOS;
     return output;
 }
 
@@ -46,7 +50,8 @@ float4 KarstParticleFrag(ParticleVertData input) : SV_TARGET
 {
     KarstParticle particle = _ParticleBuffer[input.instanceId];
     float3 color = GetMaterialColor(particle.materialIndex);
-    return float4(color, 1);
+    float NdotL = dot(_MainLightPosition, input.normalWS) * 0.5 + 0.5;
+    return float4(color * NdotL, 1);
 }
 
 #endif

@@ -25,8 +25,6 @@ namespace BBL
             Debug.Log("SimulationRes: " + SimulationVolume.rt.width + ", " + 
                       SimulationVolume.rt.height + ", " + 
                       SimulationVolume.rt.volumeDepth);
-
-            Fill(settings);
         }
 
         public void Dispose()
@@ -39,7 +37,7 @@ namespace BBL
             Active = active;
         }
 
-        private void Fill(KarstSimSettings settings)
+        public void Fill(KarstSimSettings settings)
         {
             ComputeShader compute = settings.KarstSimCompute;
             int kernel = KarstSimSettings.FILL_KERNEL;
@@ -51,9 +49,27 @@ namespace BBL
             compute.SetFloat(cache.Get("_ClayAmount"), settings.ClayAmount);
             compute.SetFloat(cache.Get("_SandAmount"), settings.SandAmount);
             compute.SetVector(cache.Get("_SimulationDimensions"), (Vector3)settings.SimulationResolution);
-            compute.SetFloat(cache.Get("_KarstLayerNoiseScale"), 1.0f / settings.LayerNoiseScale);
+            compute.SetFloat(cache.Get("_KarstLayerNoiseScale"), settings.LayerNoiseScale);
             compute.SetInt(cache.Get("_KarstLayerNoiseSeed"), settings.LayerNoiseSeed);
             compute.SetInt(cache.Get("_KarstLayerNoiseOctaves"), settings.LayerNoiseOctaves);
+            
+            compute.Dispatch(kernel, groups.x, groups.y, groups.z);
+        }
+
+        public void Fracture(KarstSimSettings settings)
+        {
+            ComputeShader compute = settings.KarstSimCompute;
+            int kernel = KarstSimSettings.FRACTURE_KERNEL;
+            Vector3Int groups = KarstSimUtilities.GetThreadGroupsFull(SimulationVolume.rt, KarstSimSettings.THREADGROUP_SIZE);
+            
+            compute.SetTexture(kernel, cache.Get("_FractureTarget"), SimulationVolume);
+            compute.SetFloat(cache.Get("_FloorAmount"), settings.FloorAmount);
+            compute.SetFloat(cache.Get("_StoneAmount"), settings.StoneAmount);
+            compute.SetVector(cache.Get("_SimulationDimensions"), (Vector3)settings.SimulationResolution);
+            compute.SetFloat(cache.Get("_KarstFractureNoiseScale"), settings.FractureNoiseScale);
+            compute.SetFloat(cache.Get("_KarstFractureNoiseAngle"), settings.FractureAngle);
+            compute.SetInt(cache.Get("_KarstFractureNoiseSeed"), settings.FractureNoiseSeed);
+            compute.SetFloat(cache.Get("_KarstFractureZoom"), settings.FractureZoom);
             
             compute.Dispatch(kernel, groups.x, groups.y, groups.z);
         }
