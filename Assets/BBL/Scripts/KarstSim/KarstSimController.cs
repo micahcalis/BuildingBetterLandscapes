@@ -21,6 +21,7 @@ namespace BBL
             Debug.Log("Start Simulation");
             Simulation = new KarstSimulation();
             CreateSimulationVolume();
+            Simulation.ClearFlux(settings);
             Simulation.SetActive(true);
         }
 
@@ -63,8 +64,8 @@ namespace BBL
 
         private void BigUpdate(float deltaTime)
         {
-            Simulation.ClearFlux(settings);
             Simulation.InjectWater(settings, deltaTime);
+            Simulation.CalculateFlux(settings, deltaTime);
         }
     }
 }

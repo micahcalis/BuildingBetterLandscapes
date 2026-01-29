@@ -127,6 +127,21 @@ namespace BBL
             
             compute.Dispatch(kernel, groupSize.x, groupSize.y, groupSize.z);
         }
+
+        public void CalculateFlux(KarstSimSettings settings, float deltaTime)
+        {
+            ComputeShader compute = settings.KarstSimCompute;
+            int kernel = KarstSimSettings.CALC_FLUX_KERNEL;
+            Vector3Int groupSize = KarstSimUtilities.GetThreadGroupsFull(SimulationVolume.rt,
+                KarstSimSettings.THREADGROUP_SIZE_S);
+            
+            compute.SetTexture(kernel, cache.Get("_FluxSource"), SimulationVolume);
+            compute.SetBuffer(kernel, cache.Get("_FluxBuffer"), FluxBuffer);
+            compute.SetVector(cache.Get("_SimulationDimensions"), (Vector3)settings.SimulationResolution);
+            compute.SetFloat(cache.Get("_DeltaTime"), deltaTime);
+            
+            compute.Dispatch(kernel, groupSize.x, groupSize.y, groupSize.z);
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]

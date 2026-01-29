@@ -90,3 +90,19 @@ void InjectWater (uint3 id : SV_DispatchThreadID) // 3
 
     InjectWater(_InjectTarget, voxel, id, _DeltaTime);
 }
+
+RWTexture3D<float4> _FluxSource;
+
+[numthreads(8,8,8)]
+void CalculateFlux(uint3 id : SV_DispatchThreadID) // 4
+{
+    if (ThreadOutOfBounds(id))
+        return;
+
+    KarstMaterial voxel = SampleVoxel(id, _FluxSource);
+
+    if (!HasWater(voxel))
+        return;
+
+    UpdateFlux(_FluxSource, id, _DeltaTime);
+}
