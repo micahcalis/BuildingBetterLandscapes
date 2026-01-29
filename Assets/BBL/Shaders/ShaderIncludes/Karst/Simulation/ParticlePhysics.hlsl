@@ -29,17 +29,18 @@ struct MargolusRow
     MaterialPair RightFront;
 };
 
-int _IsEven;
+int _MargolusIsEven;
 
 bool GetMargolusBaseId(uint3 id, out uint3 baseId)
 {
-    baseId = id * 2 + (uint3)_IsEven;
+    baseId = id * 2 + (uint3)_MargolusIsEven;
     return !ThreadOutOfBounds(baseId);
 }
 
 int3 GetMargolusCoord(int3 base, int2 dir, bool top)
 {
-    return base + int3(dir.x, top ? 1 : 0, dir.y);
+    int3 rawCoord = base + int3(dir.x, top ? 1 : 0, dir.y);
+    return clamp(rawCoord, 0, uint3(_SimulationDimensions - 1));
 }
 
 void SetPairByIndex(int i, MaterialPair pair, inout MargolusRow row)
@@ -101,6 +102,19 @@ void ApplyVerticalGravity(inout MargolusRow top, inout MargolusRow bot)
     TrySwap(top.RightBack, bot.RightBack);  
     TrySwap(top.LeftFront, bot.LeftFront);  
     TrySwap(top.RightFront, bot.RightFront);
+}
+
+void ApplyHorizontalSlopes(inout MargolusRow top, inout MargolusRow bot)
+{
+    TrySwap(top.LeftBack, bot.LeftFront);
+    TrySwap(top.RightBack, bot.RightFront);
+    TrySwap(top.LeftFront, bot.LeftBack);
+    TrySwap(top.RightFront, bot.RightBack);
+    
+    TrySwap(top.LeftBack, bot.RightBack);
+    TrySwap(top.RightBack, bot.LeftBack);
+    TrySwap(top.LeftFront, bot.LeftBack);
+    TrySwap(top.RightFront, bot.RightBack);
 }
 
 void ApplyDiagonalSlopes(inout MargolusRow top, inout MargolusRow bot)

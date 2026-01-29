@@ -11,6 +11,7 @@ struct KarstParticle
     float3 localPos;
     int materialIndex;
     float density;
+    float waterAmount;
 };
 
 float4x4 _ParticleToWorld;
@@ -47,6 +48,7 @@ void TryAppendParticle(int3 id,
     particle.localPos = GetLocalPosition(id);
     particle.materialIndex = GetMaterialIndex(sample.r);
     particle.density = sample.g;
+    particle.waterAmount = sample.b;
     particleBuffer.Append(particle);
 }
 
@@ -63,6 +65,7 @@ void TryAppendHologram(int3 id,
     particle.localPos = GetLocalPosition(id);
     particle.materialIndex = GetMaterialIndex(sample.r);
     particle.density = sample.g;
+    particle.waterAmount = sample.b;
     particleBuffer.Append(particle);
 }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
 namespace BBL
@@ -29,7 +30,9 @@ namespace BBL
         [field: SerializeField] public SliderDisplay FractureAngle { get; private set; }
         [field: SerializeField] public SliderDisplay FractureNoiseScale { get; private set; }
         [field: SerializeField] public SliderDisplay FractureNoiseSeed { get; private set; }
-
+        [field: SerializeField] public SliderDisplay WaterInjectRate { get; private set; }
+        [field: SerializeField] public SliderDisplay PermeableThreshold { get; private set; }
+        
         public List<SliderDisplay> GetSliders()
         {
             return new List<SliderDisplay>()
@@ -47,7 +50,9 @@ namespace BBL
                 FractureZoom,
                 FractureAngle,
                 FractureNoiseScale,
-                FractureNoiseSeed
+                FractureNoiseSeed,
+                WaterInjectRate,
+                PermeableThreshold,
             };
         }
     }

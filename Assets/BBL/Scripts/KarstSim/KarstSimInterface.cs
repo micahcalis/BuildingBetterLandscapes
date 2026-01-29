@@ -43,6 +43,8 @@ namespace BBL
             container.FractureNoiseScale.OnSliderChanged += SetFractureNoiseScale;
             container.FractureNoiseSeed.OnSliderChanged += SetFractureNoiseSeed;
             container.FractureAngle.OnSliderChanged += SetFractureAngle;
+            container.WaterInjectRate.OnSliderChanged += SetWaterInjectRate;
+            container.PermeableThreshold.OnSliderChanged += SetPermeableThreshold;
         }
 
         private void OnSimStart(Action onSimStart)
@@ -149,6 +151,16 @@ namespace BBL
         private void SetFractureNoiseSeed(float value)
         {
             settings.FractureNoiseSeed = (int)value;
+        }
+
+        private void SetWaterInjectRate(float value)
+        {
+            settings.WaterInjectRate = value;
+        }
+
+        private void SetPermeableThreshold(float value)
+        {
+            settings.PermeableThreshold = value;
         }
 
         private void ForceApplySettings()

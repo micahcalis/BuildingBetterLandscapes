@@ -78,11 +78,14 @@ MonoBehaviour:
   <KarstSimSettings>k__BackingField:
     <SimulationCenter>k__BackingField: {x: 0, y: 0, z: 0}
     <ParticleSize>k__BackingField: 0.1
+    <TicksPerSecond>k__BackingField: 50
     <UserIntPrefab>k__BackingField: {fileID: 1083530521988673654, guid: 2d140d33cd7825448a21dac065c2feff,
       type: 3}
     <KarstSimCompute>k__BackingField: {fileID: 7200000, guid: 0ccc8e7e9325d77428baf4617fec80b1,
       type: 3}
     <KarstExtractCompute>k__BackingField: {fileID: 7200000, guid: ed0bd4deedd24389a1447876abd71553,
+      type: 3}
+    <FluxClearCompute>k__BackingField: {fileID: 7200000, guid: 9529f36139094f0fa559109b14c7f627,
       type: 3}
     <ParticleMaterial>k__BackingField: {fileID: 2100000, guid: 6bac2190e5414224692edbc905c78018,
       type: 2}

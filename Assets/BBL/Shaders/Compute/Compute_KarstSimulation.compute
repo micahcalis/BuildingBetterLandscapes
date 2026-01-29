@@ -43,7 +43,7 @@ void FractureVolume (uint3 id : SV_DispatchThreadID) // 1
         return;
     
     float fractureDensity = GetFractureDensity(id);
-    float newDensity = targetSample.g * fractureDensity;
+    float newDensity = targetSample.g * fractureDensity * 0.05;
     float waterAmount = (1 - newDensity) * 0.5f;
     _FractureTarget[id] = float4(targetSample.r,
         newDensity,
@@ -64,6 +64,7 @@ void MargolusSwap (uint3 id : SV_DispatchThreadID) // 2
     GetMargolusRows(baseId, _MargolusTarget, topRow, bottomRow);
 
     ApplyVerticalGravity(topRow, bottomRow);
+    ApplyHorizontalSlopes(topRow, bottomRow);
     ApplyDiagonalSlopes(topRow, bottomRow);
 
     ResolveMargolusRows(baseId, _MargolusTarget, topRow, bottomRow);
@@ -75,6 +76,11 @@ RWTexture3D<float4> _InjectTarget;
 void InjectWater (uint3 id : SV_DispatchThreadID) // 3
 {
     if (ThreadOutOfBounds(id))
+        return;
+
+    float height = GetUvw(id).y;
+
+    if (!IsOnStoneLayer(height, _FloorAmount, _StoneAmount))
         return;
 
     KarstMaterial voxel = SampleVoxel(id, _InjectTarget);

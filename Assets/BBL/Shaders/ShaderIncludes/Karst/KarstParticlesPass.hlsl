@@ -56,7 +56,8 @@ float4 KarstParticleFrag(ParticleVertData input) : SV_TARGET
 
 float4 KarstHologramFrag(ParticleVertData input) : SV_TARGET
 {
-    return _EmptyColor;
+    float interpolator = _ParticleBuffer[input.instanceId].waterAmount;
+    return lerp(_EmptyColor, _WaterColor, saturate(interpolator));
 }
 
 #endif

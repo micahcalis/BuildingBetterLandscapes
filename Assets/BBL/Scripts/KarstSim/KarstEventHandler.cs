@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace BBL
@@ -7,9 +8,11 @@ namespace BBL
     {
         public event Action OnSimStart;
         public event Action OnSimEnd;
+        public event Action<float> OnSimUpdate;
         
         private KarstSimSettings settings;
         private KarstSimInterface karstSimInterface;
+        private KarstSimulation simulation => KarstSimController.Simulation;
         
         private void Start()
         {
@@ -26,6 +29,7 @@ namespace BBL
             void StartSim()
             {
                 OnSimStart?.Invoke();
+                StartCoroutine(SimulationUpdate());
             }
 
             void EndSim()
@@ -34,6 +38,21 @@ namespace BBL
             }
             
             karstSimInterface = new KarstSimInterface(settings, StartSim, EndSim);
+        }
+
+        private IEnumerator SimulationUpdate()
+        {
+            float deltaTime = settings.GetDeltaTime();
+            
+            while (true)
+            {
+                if (simulation != null && simulation.Active)
+                {
+                    OnSimUpdate?.Invoke(deltaTime);
+                }
+                
+                yield return new WaitForSeconds(deltaTime);
+            }
         }
     }
 }

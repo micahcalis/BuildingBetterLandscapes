@@ -64,7 +64,7 @@ namespace BBL
         {
             ComputeShader compute = settings.KarstExtractCompute;
             int kernel = KarstSimSettings.EXTRACT_KERNEL;
-            Vector3Int groups = KarstSimUtilities.GetThreadGroupsFull(simulation.SimulationVolume.rt, KarstSimSettings.THREADGROUP_SIZE);
+            Vector3Int groups = KarstSimUtilities.GetThreadGroupsFull(simulation.SimulationVolume.rt, KarstSimSettings.THREADGROUP_SIZE_S);
 
             if (NewBuffer())
             {
@@ -145,5 +145,6 @@ namespace BBL
         public Vector3 LocalPos;
         public int MaterialIndex;
         public float Density;
+        public float WaterAmount;
     }
 }
