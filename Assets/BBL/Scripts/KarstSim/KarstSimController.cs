@@ -66,6 +66,7 @@ namespace BBL
         {
             Simulation.InjectWater(settings, deltaTime);
             Simulation.CalculateFlux(settings, deltaTime);
+            Simulation.ResolveFlux(settings);
         }
     }
 }

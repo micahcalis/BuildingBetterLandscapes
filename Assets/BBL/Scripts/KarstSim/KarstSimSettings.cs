@@ -13,6 +13,7 @@ namespace BBL
         public static readonly int MARGOLUS_KERNEL = 2;
         public static readonly int INJECT_WATER_KERNEL = 3;
         public static readonly int CALC_FLUX_KERNEL = 4;
+        public static readonly int RSLV_FLUX_KERNEL = 5;
         public static int THREADGROUP_SIZE_S = 8;
         public static int THREADGROUP_SIZE_L = 32;
         

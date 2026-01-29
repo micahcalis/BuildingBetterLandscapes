@@ -71,7 +71,7 @@ PressurePair GetPressurePair(RWTexture3D<float4> fluxSource, uint3 id)
     if (any(id < 0) || any(id >= _SimulationDimensions))
     {
         pair.waterAmount = 0;
-        pair.height = 0; 
+        pair.height = id.y; 
         return pair;
     }
     
@@ -117,7 +117,7 @@ void UpdateFlux(RWTexture3D<float4> fluxSource, int3 id, float deltaTime)
     [unroll(F_DIR_COUNT)]
     for (int i = 0; i < F_DIR_COUNT; i++)
     {
-        uint3 coord = id + FLUX_DIRS[i];
+        int3 coord = id + FLUX_DIRS[i];
         PressurePair pairB = GetPressurePair(fluxSource, coord);
         float fluxAccel = GetFluxAcceleration(pairA, pairB, deltaTime);
         ApplyDirectionalFlux(i, fluxAccel, flux);
@@ -125,6 +125,31 @@ void UpdateFlux(RWTexture3D<float4> fluxSource, int3 id, float deltaTime)
 
     NormalizeFlux(pairA.waterAmount, flux);
     SetFlux(flux, id, _SimulationDimensions);
+}
+
+float GetTotalOutflow(int3 id)
+{
+    Flux outflowFlux = GetFlux(id, _SimulationDimensions);
+    return SumFlux(outflowFlux);
+}
+
+float GetTotalInflow(int3 id)
+{
+    Flux inflowFlux = (Flux)0;
+    
+    [unroll(F_DIR_COUNT)]
+    for (int i = 0; i < F_DIR_COUNT; i++)
+    {
+        int3 coord = id + FLUX_DIRS[i];
+        if (ThreadOutOfBounds(coord))
+            continue;
+
+        Flux flux = GetFlux(coord, _SimulationDimensions);
+        float inflow = GetFluxValByIndex(GetOppositeIndex(i), flux);
+        SetFluxValByIndex(i, inflow, inflowFlux);
+    }
+
+    return SumFlux(inflowFlux);
 }
 
 #endif

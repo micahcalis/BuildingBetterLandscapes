@@ -8,7 +8,7 @@
 #define F_DIR_F int3(0, 0, 1)
 #define F_DIR_B int3(0, 0, -1)
 #define F_DIR_COUNT 6
-#define FLUX_DAMPING 0.99f
+#define FLUX_DAMPING 0.5f
 
 static const int3 FLUX_DIRS[F_DIR_COUNT] = 
 {
@@ -97,6 +97,15 @@ void ScaleFlux(float scale, inout Flux flux)
         float scaledFlux = GetFluxValByIndex(i, flux) * scale;
         SetFluxValByIndex(i, scaledFlux, flux);
     }
+}
+
+// AI generated
+int GetOppositeIndex(int i)
+{
+    // 0(R) <-> 1(L)
+    // 2(U) <-> 3(D)
+    // 4(F) <-> 5(B)
+    return i ^ 1; 
 }
 
 #endif

@@ -2,6 +2,8 @@
 #pragma kernel FractureVolume
 #pragma kernel MargolusSwap
 #pragma kernel InjectWater
+#pragma kernel CalculateFlux
+#pragma kernel ResolveFlux
 
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/KarstCore.hlsl"
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/KarstVolumeInitialization.hlsl"
@@ -105,4 +107,24 @@ void CalculateFlux(uint3 id : SV_DispatchThreadID) // 4
         return;
 
     UpdateFlux(_FluxSource, id, _DeltaTime);
+}
+
+[numthreads(8,8,8)]
+void ResolveFlux(uint3 id : SV_DispatchThreadID) // 5
+{
+    if (ThreadOutOfBounds(id))
+        return;
+
+    KarstMaterial voxel = SampleVoxel(id, _FluxSource);
+    
+    if (!IsPermeable(voxel.density))
+        return;
+
+    float outflow = GetTotalOutflow(id);
+    float inflow = GetTotalInflow(id);
+    float flow = inflow - outflow;
+    
+    voxel.waterAmount += flow;
+    voxel.waterAmount = max(voxel.waterAmount, 0.0f);
+    _FluxSource[id] = ResolveMaterial(voxel);
 }
