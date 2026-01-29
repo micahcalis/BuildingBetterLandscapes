@@ -1,8 +1,12 @@
 #pragma kernel FillVolume
 #pragma kernel FractureVolume
+#pragma kernel MargolusSwap
+#pragma kernel InjectWater
 
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/KarstCore.hlsl"
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/KarstVolumeInitialization.hlsl"
+#include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/ParticlePhysics.hlsl"
+#include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/FluidPhysics.hlsl"
 
 RWTexture3D<float4> _FillTarget;
 
@@ -16,7 +20,7 @@ void FillVolume (uint3 id : SV_DispatchThreadID) // 0
     if (material.density > 0)
     {
         float matPacked = PackMaterialIndex(material.materialIndex);
-        _FillTarget[id] = float4(matPacked, material.density, 0, 1);
+        _FillTarget[id] = float4(matPacked, material.density, material.waterAmount, 1);
     }
     else
     {
@@ -40,8 +44,43 @@ void FractureVolume (uint3 id : SV_DispatchThreadID) // 1
     
     float fractureDensity = GetFractureDensity(id);
     float newDensity = targetSample.g * fractureDensity;
+    float waterAmount = (1 - newDensity) * 0.5f;
     _FractureTarget[id] = float4(targetSample.r,
         newDensity,
-        targetSample.b,
+        waterAmount,
         targetSample.a);
+}
+
+RWTexture3D<float4> _MargolusTarget;
+
+[numthreads(8,8,8)]
+void MargolusSwap (uint3 id : SV_DispatchThreadID) // 2
+{
+    uint3 baseId;
+    if (!GetMargolusBaseId(id, baseId))
+        return;
+
+    MargolusRow topRow; MargolusRow bottomRow;
+    GetMargolusRows(baseId, _MargolusTarget, topRow, bottomRow);
+
+    ApplyVerticalGravity(topRow, bottomRow);
+    ApplyDiagonalSlopes(topRow, bottomRow);
+
+    ResolveMargolusRows(baseId, _MargolusTarget, topRow, bottomRow);
+}
+
+RWTexture3D<float4> _InjectTarget;
+
+[numthreads(8,8,8)]
+void InjectWater (uint3 id : SV_DispatchThreadID) // 3
+{
+    if (ThreadOutOfBounds(id))
+        return;
+
+    KarstMaterial voxel = SampleVoxel(id, _InjectTarget);
+
+    if (!CanInjectWater(voxel))
+        return;
+
+    InjectWater(_InjectTarget, voxel, id, _DeltaTime);
 }
