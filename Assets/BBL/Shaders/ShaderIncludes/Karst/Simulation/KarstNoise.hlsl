@@ -2,6 +2,7 @@
 #define KARST_NOISE_INCLUDED
 
 #include "Assets/BBL/Shaders/ShaderIncludes/Library/FBM.hlsl"
+#include "Assets/BBL/Shaders/ShaderIncludes/Functions/VoronoiFunctions.hlsl"
 
 #define LAYER_N_STRENGTH 0.15f
 #define LAYER_N_F_MUL 1.15f
@@ -12,6 +13,8 @@
 #define FRAC_F_MUL 0.33f
 #define FRAC_EDGE 0.5
 #define FRAC_CONTRAST 6.0f
+#define WATER_N_THRESH 0.025f
+#define WATER_N_ANGLE 2.0f
 
 struct Fracture
 {
@@ -27,6 +30,8 @@ float _KarstFractureNoiseScale;
 float _KarstFractureNoiseAngle;
 int _KarstFractureNoiseSeed;
 float _KarstFractureZoom;
+
+float _WaterColumnCellDensity;
 
 // from unity shader graph: https://docs.unity3d.com/Packages/com.unity.shadergraph@6.9/manual/Gradient-Noise-Node.html
 float2 RandomVector2D(float2 pos)
@@ -151,6 +156,18 @@ Fracture GetFractureNoise(float2 uv)
     fracture.density = density;
     fracture.height = ((heightNoise / FRAC_N_L_STRENGTH)) * 3;
     return fracture;
+}
+
+Voronoi GetWaterColumnVoronoi(float2 uv)
+{
+    return Voronoi2D(uv, WATER_N_ANGLE, _WaterColumnCellDensity);
+}
+
+float GetWaterColumnNoise(float2 uv)
+{
+    Voronoi voronoi = GetWaterColumnVoronoi(uv + _KarstFractureNoiseSeed);
+    float injectMask = step(voronoi.distance, WATER_N_THRESH * _WaterColumnCellDensity);
+    return injectMask * voronoi.id;
 }
 
 #endif

@@ -84,8 +84,8 @@ void InjectWater (uint3 id : SV_DispatchThreadID) // 3
 
     float height = GetUvw(id).y;
 
-    if (!IsOnStoneLayer(height, _FloorAmount, _StoneAmount))
-        return;
+    // if (!IsOnStoneLayer(height, _FloorAmount, _StoneAmount))
+    //     return;
 
     KarstMaterial voxel = SampleVoxel(id, _InjectTarget);
 
@@ -147,5 +147,6 @@ void ErodeVolume (uint3 id : SV_DispatchThreadID) // 6
 
     Flow inflow = GetTotalInflow(_ErosionTarget, id);
     ErodeMaterial(inflow, voxel);
+   // SolutionalStoping(_ErosionTarget, id, voxel);
     _ErosionTarget[id] = ResolveMaterial(voxel);
 }

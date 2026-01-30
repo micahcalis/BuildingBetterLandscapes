@@ -44,6 +44,7 @@ namespace BBL
             container.FractureNoiseSeed.OnSliderChanged += SetFractureNoiseSeed;
             container.FractureAngle.OnSliderChanged += SetFractureAngle;
             container.WaterInjectRate.OnSliderChanged += SetWaterInjectRate;
+            container.WaterColumnCellDensity.OnSliderChanged += SetWaterColumnCellDensity;
             container.PermeableThreshold.OnSliderChanged += SetPermeableThreshold;
             container.ErosionRate.OnSliderChanged += SetErosionRate;
         }
@@ -167,6 +168,11 @@ namespace BBL
         private void SetErosionRate(float value)
         {
             settings.ErosionRate = value;
+        }
+
+        private void SetWaterColumnCellDensity(float value)
+        {
+            settings.WaterColumnCellDensity = value;
         }
 
         private void ForceApplySettings()

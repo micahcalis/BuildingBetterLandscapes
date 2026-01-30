@@ -66,7 +66,7 @@ float GetFractureDensity(uint3 id)
     
     Fracture fracture = GetFractureNoise(uv);
     float baseHeight = _FloorAmount + _StoneAmount;
-    float fractureHeight = baseHeight - fracture.height * _StoneAmount;
+    float fractureHeight = baseHeight - fracture.height * _StoneAmount * 0.2;
     float voxelHeight = rcp(_SimulationDimensions.y);
     
     float fractureHeightMin = fractureHeight - voxelHeight * 1.5;

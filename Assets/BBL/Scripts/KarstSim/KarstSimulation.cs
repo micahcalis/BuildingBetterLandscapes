@@ -121,6 +121,7 @@ namespace BBL
             compute.SetVector(cache.Get("_SimulationDimensions"), (Vector3)settings.SimulationResolution);
             compute.SetFloat(cache.Get("_DeltaTime"), deltaTime);
             compute.SetFloat(cache.Get("_WaterInjectRate"), settings.WaterInjectRate);
+            compute.SetFloat(cache.Get("_WaterColumnCellDensity"), settings.WaterColumnCellDensity);
             compute.SetFloat(cache.Get("_WaterPermThreshold"), settings.PermeableThreshold);
             compute.SetFloat(cache.Get("_FloorAmount"), settings.FloorAmount);
             compute.SetFloat(cache.Get("_StoneAmount"), settings.StoneAmount);

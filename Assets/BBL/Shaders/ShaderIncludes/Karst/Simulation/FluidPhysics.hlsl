@@ -14,11 +14,12 @@ struct PressurePair
 #define INJECT_WALL_AMOUNT 0.0f
 #define EJECT_WALL_THICKNESS 0
 #define EJECT_WALL_AMOUNT 0.0f
-#define F_GRAVITY 5.0f
+#define F_GRAVITY 2.0f
 #define MAX_FLUX_ACCEL 5.0f
 #define HEIGHT_SCALAR 0.1f
 #define RAIN_ACID 1.0f
 #define KARST_ACID 0.1f
+#define FLUX_DAMPING 0.8f
 
 float _WaterInjectRate;
 float _WaterPermThreshold;
@@ -35,8 +36,8 @@ bool IsPermeable(float density)
 
 bool CanInjectWater(KarstMaterial voxel, RWTexture3D<float4> injectTarget, int3 id)
 {
-    if (voxel.materialIndex != STONE && !IsAir(voxel.density))
-        return false;
+    // if (voxel.materialIndex != STONE && !IsAir(voxel.density))
+    //     return false;
     
   //  return IsPermeable(voxel.density);
     
@@ -45,8 +46,8 @@ bool CanInjectWater(KarstMaterial voxel, RWTexture3D<float4> injectTarget, int3 
     
     
     KarstMaterial voxelAbove = SampleVoxel(id + int3(0, 1, 0), injectTarget);
-    //return !IsPermeable(voxelAbove.density);
-    return voxelAbove.materialIndex == STONE && !IsPermeable(voxelAbove.density);
+    return !IsPermeable(voxelAbove.density);
+ //   return voxelAbove.materialIndex == STONE && !IsPermeable(voxelAbove.density);
 }
 
 bool IsInjectWall(int axisCoord)
@@ -59,24 +60,42 @@ bool IsEjectWall(int axisCoord, int axisLength)
     return axisCoord >= axisLength - EJECT_WALL_THICKNESS;
 }
 
+float GetHeightGradient(float height)
+{
+    return smoothstep(_FloorAmount, _StoneAmount, height);
+}
+
+float GetInjectMultiplier(int3 id)
+{
+    float3 uvw = GetUvw(id);
+    float2 uv = uvw.xz;
+    float height = uvw.y;
+    
+    float noise = GetWaterColumnNoise(uv);
+    float gradient = GetHeightGradient(height);
+    return noise * gradient;
+}
+
 void InjectWater(RWTexture3D<float4> injectTarget, KarstMaterial voxel, uint3 id, float deltaTime)
 {
-    Flow injectFlow = CreateFlow(_WaterInjectRate * deltaTime * 0.1, RAIN_ACID);
+    float multiplier = GetInjectMultiplier(id);
+    float inject = _WaterInjectRate * deltaTime * multiplier;
+    Flow injectFlow = CreateFlow(inject, RAIN_ACID);
     Flow baseFlow = GetBaseFlow(voxel);
     Flow netFlow = AddFlows(injectFlow, baseFlow);
     voxel.waterAmount = min(netFlow.waterFlow, 1.0f);
     voxel.acidConcentration = ResolveAcidMass(netFlow.waterFlow, netFlow.acidMass);
 
-    if (IsInjectWall(id.x))
-    {
-        voxel.waterAmount = INJECT_WALL_AMOUNT;
-        voxel.acidConcentration = KARST_ACID;
-    }
-    // else if (IsEjectWall(id.x, _SimulationDimensions.x))
+    // if (IsInjectWall(id.x))
     // {
-    //     voxel.waterAmount = EJECT_WALL_AMOUNT;
+    //     voxel.waterAmount = INJECT_WALL_AMOUNT;
     //     voxel.acidConcentration = KARST_ACID;
     // }
+    // // else if (IsEjectWall(id.x, _SimulationDimensions.x))
+    // // {
+    // //     voxel.waterAmount = EJECT_WALL_AMOUNT;
+    // //     voxel.acidConcentration = KARST_ACID;
+    // // }
     
     injectTarget[id] = ResolveMaterial(voxel);
 }

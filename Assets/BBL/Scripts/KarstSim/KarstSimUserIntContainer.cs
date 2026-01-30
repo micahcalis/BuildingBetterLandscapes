@@ -31,6 +31,7 @@ namespace BBL
         [field: SerializeField] public SliderDisplay FractureNoiseScale { get; private set; }
         [field: SerializeField] public SliderDisplay FractureNoiseSeed { get; private set; }
         [field: SerializeField] public SliderDisplay WaterInjectRate { get; private set; }
+        [field: SerializeField] public SliderDisplay WaterColumnCellDensity { get; private set; }
         [field: SerializeField] public SliderDisplay PermeableThreshold { get; private set; }
         [field: SerializeField] public SliderDisplay ErosionRate { get; private set; }
         
@@ -54,7 +55,8 @@ namespace BBL
                 FractureNoiseSeed,
                 WaterInjectRate,
                 PermeableThreshold,
-                ErosionRate
+                ErosionRate,
+                WaterColumnCellDensity
             };
         }
     }

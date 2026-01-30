@@ -45,6 +45,7 @@ namespace BBL
         public float FractureNoiseScale { get; set; }
         public int FractureNoiseSeed { get; set; }
         public float WaterInjectRate { get; set; }
+        public float WaterColumnCellDensity { get; set; }
         public float PermeableThreshold { get; set; }
         public float ErosionRate { get; set; }
 
