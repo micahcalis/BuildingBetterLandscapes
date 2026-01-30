@@ -38,6 +38,7 @@ ErosionWeights GetWeights(int materialIndex)
 #define STOPING_STEPS 10
 #define CORROSION_FACTOR 1
 #define TENSION_FACTOR 0.2
+#define CONSUME_FACTOR 0.9f
 
 float _ErosionRate;
 
@@ -50,11 +51,24 @@ float GetErosion(Flow inflow, ErosionWeights weights)
     return totalErosion;
 }
 
+void ConsumeAcid(float erosion, inout KarstMaterial voxel)
+{
+    if (voxel.materialIndex == STONE && voxel.waterAmount > 0.0001f)
+    {
+        float acidConsumed = erosion * CONSUME_FACTOR;
+        float currentAcidMass = voxel.waterAmount * voxel.acidConcentration;
+        float newAcidMass = max(currentAcidMass - acidConsumed, 0.0f);
+        voxel.acidConcentration = newAcidMass / voxel.waterAmount;
+    }
+}
+
 void ErodeMaterial(Flow inflow, inout KarstMaterial voxel)
 {
     ErosionWeights weights = GetWeights(voxel.materialIndex);
     float erosion = GetErosion(inflow, weights);
     voxel.density -= erosion;
     voxel.density = max(voxel.density, 0.0f);
+    ConsumeAcid(erosion, voxel);
 }
+
 #endif

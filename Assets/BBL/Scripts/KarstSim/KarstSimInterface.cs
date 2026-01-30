@@ -11,7 +11,7 @@ namespace BBL
     {
         private KarstSimUserIntContainer container;
         private KarstSimSettings settings;
-        private bool pauseButtonState = true;
+        private bool pauseButtonState = false;
             
         public KarstSimInterface(KarstSimSettings settings, 
             Action onSimStart,
@@ -48,7 +48,6 @@ namespace BBL
             container.FractureAngle.OnSliderChanged += SetFractureAngle;
             container.WaterInjectRate.OnSliderChanged += SetWaterInjectRate;
             container.WaterColumnCellDensity.OnSliderChanged += SetWaterColumnCellDensity;
-            container.PermeableThreshold.OnSliderChanged += SetPermeableThreshold;
             container.ErosionRate.OnSliderChanged += SetErosionRate;
         }
 

@@ -31,9 +31,9 @@ struct MargolusRow
 
 int _MargolusIsEven;
 
-bool GetMargolusBaseId(uint3 id, out uint3 baseId)
+bool GetMargolusBaseId(int3 id, out uint3 baseId)
 {
-    baseId = id * 2 + (uint3)_MargolusIsEven;
+    baseId = id * 2 - (int3)_MargolusIsEven;
     return !ThreadOutOfBounds(baseId);
 }
 

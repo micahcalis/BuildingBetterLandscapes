@@ -14,6 +14,7 @@ struct PressurePair
 #define INJECT_WALL_AMOUNT 0.0f
 #define EJECT_WALL_THICKNESS 0
 #define EJECT_WALL_AMOUNT 0.0f
+#define PERM_THRESH 0.8f
 #define F_GRAVITY 2.0f
 #define MAX_FLUX_ACCEL 5.0f
 #define HEIGHT_SCALAR 0.1f
@@ -22,7 +23,6 @@ struct PressurePair
 #define FLUX_DAMPING 0.8f
 
 float _WaterInjectRate;
-float _WaterPermThreshold;
 
 bool IsOnStoneLayer(float height, float floorAmount, float stoneAmount)
 {
@@ -31,23 +31,16 @@ bool IsOnStoneLayer(float height, float floorAmount, float stoneAmount)
 
 bool IsPermeable(float density)
 {
-    return density <= _WaterPermThreshold;
+    return density <= PERM_THRESH;
 }
 
 bool CanInjectWater(KarstMaterial voxel, RWTexture3D<float4> injectTarget, int3 id)
 {
-    // if (voxel.materialIndex != STONE && !IsAir(voxel.density))
-    //     return false;
-    
-  //  return IsPermeable(voxel.density);
-    
     if (!IsPermeable(voxel.density))
         return false;
     
-    
     KarstMaterial voxelAbove = SampleVoxel(id + int3(0, 1, 0), injectTarget);
     return !IsPermeable(voxelAbove.density);
- //   return voxelAbove.materialIndex == STONE && !IsPermeable(voxelAbove.density);
 }
 
 bool IsInjectWall(int axisCoord)
@@ -80,22 +73,11 @@ void InjectWater(RWTexture3D<float4> injectTarget, KarstMaterial voxel, uint3 id
 {
     float multiplier = GetInjectMultiplier(id);
     float inject = _WaterInjectRate * deltaTime * multiplier;
-    Flow injectFlow = CreateFlow(inject, RAIN_ACID);
+    Flow injectFlow = CreateFlow(inject, RAIN_ACID * multiplier);
     Flow baseFlow = GetBaseFlow(voxel);
     Flow netFlow = AddFlows(injectFlow, baseFlow);
     voxel.waterAmount = min(netFlow.waterFlow, 1.0f);
     voxel.acidConcentration = ResolveAcidMass(netFlow.waterFlow, netFlow.acidMass);
-
-    // if (IsInjectWall(id.x))
-    // {
-    //     voxel.waterAmount = INJECT_WALL_AMOUNT;
-    //     voxel.acidConcentration = KARST_ACID;
-    // }
-    // // else if (IsEjectWall(id.x, _SimulationDimensions.x))
-    // // {
-    // //     voxel.waterAmount = EJECT_WALL_AMOUNT;
-    // //     voxel.acidConcentration = KARST_ACID;
-    // // }
     
     injectTarget[id] = ResolveMaterial(voxel);
 }
@@ -181,25 +163,19 @@ Flow GetTotalOutflow(int3 id, float currentAcidConcentration, RWTexture3D<float4
     Flux outflowFlux = GetFlux(id, _SimulationDimensions);
     float totalWaterOut = 0;
 
-    // Loop through all 6 directions, just like Inflow
     [unroll(F_DIR_COUNT)]
     for (int i = 0; i < F_DIR_COUNT; i++)
     {
-        // 1. Check the flux amount we calculated in the previous pass
         float dirFlux = GetFluxValByIndex(i, outflowFlux);
-        
-        // Optimization: If we aren't trying to flow here, skip checks
-        if (dirFlux <= 0.00001f) continue; 
 
-        // 2. Inspect the neighbor in this direction
+        if (dirFlux <= 0.00001f)
+            continue; 
+
         int3 coord = id + FLUX_DIRS[i];
-        
-        // Boundary Check (Don't flow out of the world)
-        if (ThreadOutOfBounds(coord)) continue; 
 
-        // 3. THE FIX: Wall Check
-        // Only allow flow if the neighbor is actually permeable (Air/Water)
-        // If it is Solid Rock, we ignore this flux (treat it as 0)
+        if (ThreadOutOfBounds(coord))
+            continue; 
+
         KarstMaterial neighbor = SampleVoxel(coord, fluxSource);
         if (IsPermeable(neighbor.density)) 
         {
