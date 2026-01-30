@@ -8,6 +8,7 @@ namespace BBL
     {
         public event Action OnSimStart;
         public event Action OnSimEnd;
+        public event Action<bool> OnSetPause;
         public event Action<float> OnSimUpdate;
         
         private KarstSimSettings settings;
@@ -36,8 +37,13 @@ namespace BBL
             {
                 OnSimEnd?.Invoke();
             }
+
+            void SetPause(bool pause)
+            {
+                OnSetPause?.Invoke(pause);
+            }
             
-            karstSimInterface = new KarstSimInterface(settings, StartSim, EndSim);
+            karstSimInterface = new KarstSimInterface(settings, StartSim, EndSim, SetPause);
         }
 
         private IEnumerator SimulationUpdate()

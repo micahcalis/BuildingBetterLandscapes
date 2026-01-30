@@ -4,9 +4,10 @@ namespace BBL
 {
     public class KarstSimController
     {
-        private static int SMALL_STEPS = 1;
+        private static int SMALL_STEPS = 4;
         
         public static KarstSimulation Simulation { get; private set; }
+        public bool Pause { get; private set; } = false;
         
         private KarstSimSettings settings;
         private int fluidTimer;
@@ -34,6 +35,9 @@ namespace BBL
 
         public void SimulationUpdate(float bigDeltaTime)
         {
+            if (Pause)
+                return;
+            
             BigUpdate(bigDeltaTime);
 
             float smallDeltaTime = bigDeltaTime / SMALL_STEPS;
@@ -47,6 +51,11 @@ namespace BBL
         public void Dispose()
         {
             Simulation?.Dispose();
+        }
+
+        public void SetPause(bool pause)
+        {
+            this.Pause = pause;
         }
 
         private void CreateSimulationVolume()

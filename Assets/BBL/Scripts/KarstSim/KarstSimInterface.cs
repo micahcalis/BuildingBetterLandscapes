@@ -11,31 +11,34 @@ namespace BBL
     {
         private KarstSimUserIntContainer container;
         private KarstSimSettings settings;
+        private bool pauseButtonState = true;
             
         public KarstSimInterface(KarstSimSettings settings, 
             Action onSimStart,
-            Action onSimEnd)
+            Action onSimEnd,
+            Action<bool> setPause)
         {
             GameObject instance = Object.Instantiate(settings.UserIntPrefab);
             container = instance.GetComponent<KarstSimUserIntContainer>();
             this.settings = settings;
-            ConnectInterfaceInteractions(onSimStart, onSimEnd);
+            ConnectInterfaceInteractions(onSimStart, onSimEnd, setPause);
             OnSimEnd(null);
             ForceApplySettings();
         }
 
-        private void ConnectInterfaceInteractions(Action onSimStart, Action onSimEnd)
+        private void ConnectInterfaceInteractions(Action onSimStart, Action onSimEnd, Action<bool> setPause)
         {
             container.StartSimulationButton.onClick.AddListener(() => OnSimStart(onSimStart));
             container.EndSimulationButton.onClick.AddListener(() => OnSimEnd(onSimEnd));
             container.ViewModeButton.onClick.AddListener(ToggleViewMode);
+            container.PauseSimulationButton.onClick.AddListener(() => TogglePause(setPause));
             container.ResolutionX.OnSliderChanged += SetResolutionX;
             container.ResolutionY.OnSliderChanged += SetResolutionY;
             container.ResolutionZ.OnSliderChanged += SetResolutionZ;
             container.FloorPercentage.OnSliderChanged += SetFloorAmount;
             container.StonePercentage.OnSliderChanged += SetStoneAmount;
             container.ClayPercentage.OnSliderChanged += SetClayAmount;
-            container.SandPercentage.OnSliderChanged += SetSandAmount;
+            container.SandPercentage.OnSliderChanged += SetSandAmount; 
             container.LayerNoiseScale.OnSliderChanged += SetLayerNoiseScale;
             container.LayerNoiseSeed.OnSliderChanged += SetLayerNoiseSeed;
             container.LayerNoiseOctaves.OnSliderChanged += SetLayerNoiseOctaves;
@@ -54,6 +57,7 @@ namespace BBL
             container.StartSimulationButton.gameObject.SetActive(false);
             container.EndSimulationButton.gameObject.SetActive(true);
             container.ViewModeButton.gameObject.SetActive(true);
+            container.PauseSimulationButton.gameObject.SetActive(true);
             SetSlidersActive(false);
             onSimStart?.Invoke();
         }
@@ -63,6 +67,7 @@ namespace BBL
             container.StartSimulationButton.gameObject.SetActive(true);
             container.EndSimulationButton.gameObject.SetActive(false);
             container.ViewModeButton.gameObject.SetActive(false);
+            container.PauseSimulationButton.gameObject.SetActive(false);
             SetSlidersActive(true);
             onSimEnd?.Invoke();
         }
@@ -72,12 +77,28 @@ namespace BBL
             if (settings.ViewMode == KarstViewMode.Particles)
             {
                 settings.ViewMode = KarstViewMode.Hologram;
-                container.ViewModeText.text = KarstSimUserIntContainer.VIEW_HOLOGRAM_TEXT;
+                container.ViewModeText.text = KarstSimUserIntContainer.VIEW_PARTICLE_TEXT;
             }
             else if (settings.ViewMode == KarstViewMode.Hologram)
             {
                 settings.ViewMode = KarstViewMode.Particles;
-                container.ViewModeText.text = KarstSimUserIntContainer.VIEW_PARTICLE_TEXT;
+                container.ViewModeText.text = KarstSimUserIntContainer.VIEW_HOLOGRAM_TEXT;
+            }
+        }
+
+        private void TogglePause(Action<bool> onPause)
+        {
+            if (pauseButtonState)
+            {
+                onPause?.Invoke(false);
+                pauseButtonState = false;
+                container.PauseSimulationText.text = KarstSimUserIntContainer.PAUSE_TEXT;
+            }
+            else
+            {
+                onPause?.Invoke(true);
+                pauseButtonState = true;
+                container.PauseSimulationText.text = KarstSimUserIntContainer.RESUME_TEXT;
             }
         }
         

@@ -64,6 +64,7 @@ namespace BBL
                 karstEventHandler.OnSimStart += karstSimController.StartSimulation;
                 karstEventHandler.OnSimEnd += karstSimController.EndSimulation;
                 karstEventHandler.OnSimUpdate += karstSimController.SimulationUpdate;
+                karstEventHandler.OnSetPause += karstSimController.SetPause;
             }
         }
 

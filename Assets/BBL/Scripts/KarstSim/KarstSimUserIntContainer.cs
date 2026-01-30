@@ -10,10 +10,14 @@ namespace BBL
     {
         public static readonly string VIEW_PARTICLE_TEXT = "Voxel View";
         public static readonly string VIEW_HOLOGRAM_TEXT = "Holo View";
+        public static readonly string PAUSE_TEXT = "Pause Simulation";
+        public static readonly string RESUME_TEXT = "Resume Simulation";
         
         [field: Header("References"), Space]
         [field: SerializeField] public Button StartSimulationButton { get; private set; }
         [field: SerializeField] public Button EndSimulationButton { get; private set; }
+        [field: SerializeField] public Button PauseSimulationButton { get; private set; }
+        [field: SerializeField] public TextMeshProUGUI PauseSimulationText { get; private set; }
         [field: SerializeField] public Button ViewModeButton { get; private set; }
         [field: SerializeField] public TextMeshProUGUI ViewModeText { get; private set; }
         [field: SerializeField] public SliderDisplay ResolutionX { get; private set; }
