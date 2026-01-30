@@ -7,7 +7,7 @@ int _MaxVoxels;
 [numthreads(32,1,1)]
 void ClearFlux (uint3 id : SV_DispatchThreadID)
 {
-    if (id.x >= _MaxVoxels)
+    if ((int)id.x >= _MaxVoxels)
         return;
 
     _FluxBuffer[id.x] = (Flux)0;

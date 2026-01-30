@@ -45,6 +45,7 @@ KarstMaterial GetMaterial(int3 id)
             material.materialIndex = i;
             material.density = 1;
             material.waterAmount = 0;
+            material.acidConcentration = 0;
             return material;
         }
     }
@@ -53,6 +54,7 @@ KarstMaterial GetMaterial(int3 id)
     material.materialIndex = 0;
     material.density = 0;
     material.waterAmount = 0;
+    material.acidConcentration = 0;
     return material;
 }
 

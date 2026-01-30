@@ -52,12 +52,16 @@ float4 KarstParticleFrag(ParticleVertData input) : SV_TARGET
     float3 color = GetMaterialColor(particle.materialIndex);
     float NdotL = dot(_MainLightPosition, input.normalWS) * 0.5 + 0.5;
     return float4(color * NdotL, 1);
+   // return float4(particle.density, 0, 0, 1);
+    return float4((float3)particle.density * NdotL, 1);
 }
 
 float4 KarstHologramFrag(ParticleVertData input) : SV_TARGET
 {
-    float interpolator = _ParticleBuffer[input.instanceId].waterAmount;
-    return lerp(_EmptyColor, _WaterColor, saturate(interpolator));
+    KarstParticle particle = _ParticleBuffer[input.instanceId];
+    float4 liquidColor = lerp(_WaterColor, _AcidColor, saturate(particle.acidConcentration));
+    float4 baseColor = lerp(_EmptyColor, liquidColor, saturate(particle.waterAmount));
+    return baseColor;
 }
 
 #endif

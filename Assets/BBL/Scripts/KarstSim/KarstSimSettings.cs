@@ -14,6 +14,7 @@ namespace BBL
         public static readonly int INJECT_WATER_KERNEL = 3;
         public static readonly int CALC_FLUX_KERNEL = 4;
         public static readonly int RSLV_FLUX_KERNEL = 5;
+        public static readonly int ERODE_KERNEL = 6;
         public static int THREADGROUP_SIZE_S = 8;
         public static int THREADGROUP_SIZE_L = 32;
         
@@ -45,6 +46,7 @@ namespace BBL
         public int FractureNoiseSeed { get; set; }
         public float WaterInjectRate { get; set; }
         public float PermeableThreshold { get; set; }
+        public float ErosionRate { get; set; }
 
         public int GetVoxelCount()
         {

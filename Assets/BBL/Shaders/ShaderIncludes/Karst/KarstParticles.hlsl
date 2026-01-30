@@ -3,8 +3,7 @@
 
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/KarstCore.hlsl"
 
-#define DENSITY_EPS 1e-4
-#define NUM_MATS 3
+#define DENSITY_EPS 0.5
 
 struct KarstParticle
 {
@@ -12,6 +11,7 @@ struct KarstParticle
     int materialIndex;
     float density;
     float waterAmount;
+    float acidConcentration;
 };
 
 float4x4 _ParticleToWorld;
@@ -49,6 +49,7 @@ void TryAppendParticle(int3 id,
     particle.materialIndex = GetMaterialIndex(sample.r);
     particle.density = sample.g;
     particle.waterAmount = sample.b;
+    particle.acidConcentration = sample.a;
     particleBuffer.Append(particle);
 }
 
@@ -66,6 +67,7 @@ void TryAppendHologram(int3 id,
     particle.materialIndex = GetMaterialIndex(sample.r);
     particle.density = sample.g;
     particle.waterAmount = sample.b;
+    particle.acidConcentration = sample.a;
     particleBuffer.Append(particle);
 }
 

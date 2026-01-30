@@ -10,7 +10,7 @@
 #define FRAC_N_L_STRENGTH 0.15f
 #define FRAC_N_H_STRENGTH 0.05f
 #define FRAC_F_MUL 0.33f
-#define FRAC_EDGE 0.9
+#define FRAC_EDGE 0.5
 #define FRAC_CONTRAST 6.0f
 
 struct Fracture

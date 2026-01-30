@@ -146,5 +146,6 @@ namespace BBL
         public int MaterialIndex;
         public float Density;
         public float WaterAmount;
+        public float AcidConcentration;
     }
 }

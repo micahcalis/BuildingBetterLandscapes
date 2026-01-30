@@ -8,7 +8,7 @@
 #define F_DIR_F int3(0, 0, 1)
 #define F_DIR_B int3(0, 0, -1)
 #define F_DIR_COUNT 6
-#define FLUX_DAMPING 0.5f
+#define FLUX_DAMPING 0.92
 
 static const int3 FLUX_DIRS[F_DIR_COUNT] = 
 {

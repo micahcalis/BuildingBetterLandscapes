@@ -7,5 +7,6 @@ float4 _StoneColor;
 float4 _FloorColor;
 float4 _EmptyColor;
 float4 _WaterColor;
+float4 _AcidColor;
 
 #endif

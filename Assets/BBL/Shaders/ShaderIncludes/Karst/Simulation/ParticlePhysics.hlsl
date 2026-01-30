@@ -113,8 +113,8 @@ void ApplyHorizontalSlopes(inout MargolusRow top, inout MargolusRow bot)
     
     TrySwap(top.LeftBack, bot.RightBack);
     TrySwap(top.RightBack, bot.LeftBack);
-    TrySwap(top.LeftFront, bot.LeftBack);
-    TrySwap(top.RightFront, bot.RightBack);
+    TrySwap(top.LeftFront, bot.RightFront);
+    TrySwap(top.RightFront, bot.LeftFront);
 }
 
 void ApplyDiagonalSlopes(inout MargolusRow top, inout MargolusRow bot)

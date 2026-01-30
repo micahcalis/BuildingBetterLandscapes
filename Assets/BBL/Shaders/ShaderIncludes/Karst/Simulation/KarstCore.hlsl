@@ -12,6 +12,7 @@ struct KarstMaterial
     int materialIndex;
     float density;
     float waterAmount;
+    float acidConcentration;
 };
 
 float3 _SimulationDimensions;
@@ -32,7 +33,7 @@ float3 GetUvw(uint3 id)
     return (float3)id / _SimulationDimensions;
 }
 
-bool ThreadOutOfBounds(uint3 id)
+bool ThreadOutOfBounds(int3 id)
 {
     return any(id >= (int3)_SimulationDimensions);
 }
@@ -49,6 +50,7 @@ KarstMaterial SampleVoxel(uint3 id, RWTexture3D<float4> simulationVolume)
     material.materialIndex = GetMaterialIndex(sample.r);
     material.density = sample.g;
     material.waterAmount = sample.b;
+    material.acidConcentration = sample.a;
     return material;
 }
 
@@ -57,7 +59,7 @@ float4 ResolveMaterial(KarstMaterial material)
     return float4(PackMaterialIndex(material.materialIndex),
         material.density,
         material.waterAmount,
-        0);
+        material.acidConcentration);
 }
 
 #endif

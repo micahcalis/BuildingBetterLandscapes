@@ -11,6 +11,7 @@
         [Header(Hologram)]
         _EmptyColor("Empty Color", Color) = (1, 0, 0, 0.2)
         _WaterColor("Water Color", Color) = (0, 0, 1, 0.2)
+        _AcidColor("Acid Color", Color) = (1, 1, 0, 1)
     }
     SubShader
     {

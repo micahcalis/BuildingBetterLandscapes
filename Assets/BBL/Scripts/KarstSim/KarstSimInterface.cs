@@ -45,6 +45,7 @@ namespace BBL
             container.FractureAngle.OnSliderChanged += SetFractureAngle;
             container.WaterInjectRate.OnSliderChanged += SetWaterInjectRate;
             container.PermeableThreshold.OnSliderChanged += SetPermeableThreshold;
+            container.ErosionRate.OnSliderChanged += SetErosionRate;
         }
 
         private void OnSimStart(Action onSimStart)
@@ -161,6 +162,11 @@ namespace BBL
         private void SetPermeableThreshold(float value)
         {
             settings.PermeableThreshold = value;
+        }
+
+        private void SetErosionRate(float value)
+        {
+            settings.ErosionRate = value;
         }
 
         private void ForceApplySettings()

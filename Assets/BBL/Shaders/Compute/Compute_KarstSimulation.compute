@@ -4,11 +4,13 @@
 #pragma kernel InjectWater
 #pragma kernel CalculateFlux
 #pragma kernel ResolveFlux
+#pragma kernel ErodeVolume
 
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/KarstCore.hlsl"
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/KarstVolumeInitialization.hlsl"
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/ParticlePhysics.hlsl"
 #include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/FluidPhysics.hlsl"
+#include "Assets/BBL/Shaders/ShaderIncludes/Karst/Simulation/Erosion.hlsl"
 
 RWTexture3D<float4> _FillTarget;
 
@@ -45,11 +47,11 @@ void FractureVolume (uint3 id : SV_DispatchThreadID) // 1
         return;
     
     float fractureDensity = GetFractureDensity(id);
-    float newDensity = targetSample.g * fractureDensity * 0.05;
+    float newDensity = targetSample.g * fractureDensity;// * 0.05;
     float waterAmount = (1 - newDensity) * 0.5f;
     _FractureTarget[id] = float4(targetSample.r,
         newDensity,
-        waterAmount,
+        0,//waterAmount,
         targetSample.a);
 }
 
@@ -87,7 +89,7 @@ void InjectWater (uint3 id : SV_DispatchThreadID) // 3
 
     KarstMaterial voxel = SampleVoxel(id, _InjectTarget);
 
-    if (!CanInjectWater(voxel))
+    if (!CanInjectWater(voxel, _InjectTarget, id))
         return;
 
     InjectWater(_InjectTarget, voxel, id, _DeltaTime);
@@ -96,7 +98,7 @@ void InjectWater (uint3 id : SV_DispatchThreadID) // 3
 RWTexture3D<float4> _FluxSource;
 
 [numthreads(8,8,8)]
-void CalculateFlux(uint3 id : SV_DispatchThreadID) // 4
+void CalculateFlux (uint3 id : SV_DispatchThreadID) // 4
 {
     if (ThreadOutOfBounds(id))
         return;
@@ -110,7 +112,7 @@ void CalculateFlux(uint3 id : SV_DispatchThreadID) // 4
 }
 
 [numthreads(8,8,8)]
-void ResolveFlux(uint3 id : SV_DispatchThreadID) // 5
+void ResolveFlux (uint3 id : SV_DispatchThreadID) // 5
 {
     if (ThreadOutOfBounds(id))
         return;
@@ -120,11 +122,30 @@ void ResolveFlux(uint3 id : SV_DispatchThreadID) // 5
     if (!IsPermeable(voxel.density))
         return;
 
-    float outflow = GetTotalOutflow(id);
-    float inflow = GetTotalInflow(id);
-    float flow = inflow - outflow;
+    Flow baseFlow = GetBaseFlow(voxel);
+    Flow outflow = GetTotalOutflow(id, voxel.acidConcentration, _FluxSource);
+    Flow inflow = GetTotalInflow(_FluxSource, id);
+    Flow netFlow = SubtractFlows(AddFlows(baseFlow, inflow), outflow);
     
-    voxel.waterAmount += flow;
-    voxel.waterAmount = max(voxel.waterAmount, 0.0f);
+    voxel.waterAmount = max(netFlow.waterFlow, 0.0f);
+    voxel.acidConcentration = ResolveAcidMass(voxel.waterAmount, netFlow.acidMass);
     _FluxSource[id] = ResolveMaterial(voxel);
+}
+
+RWTexture3D<float4> _ErosionTarget;
+
+[numthreads(8,8,8)]
+void ErodeVolume (uint3 id : SV_DispatchThreadID) // 6
+{
+    if (ThreadOutOfBounds(id))
+        return;
+
+    KarstMaterial voxel = SampleVoxel(id, _ErosionTarget);
+
+    if (IsAir(voxel.density))
+        return;
+
+    Flow inflow = GetTotalInflow(_ErosionTarget, id);
+    ErodeMaterial(inflow, voxel);
+    _ErosionTarget[id] = ResolveMaterial(voxel);
 }
